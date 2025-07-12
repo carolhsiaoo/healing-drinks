@@ -1,0 +1,43 @@
+// src/components/ChocolateShaderMaterial.ts
+import * as THREE from 'three';
+import { ShaderMaterial } from 'three';
+
+// Vertex Shader
+const vertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+// Fragment Shader
+const fragmentShader = `
+  uniform float uTime;
+  uniform vec3 uColor1;
+  uniform vec3 uColor2;
+  varying vec2 vUv;
+
+  void main() {
+    float wave = sin(vUv.y * 10.0 + uTime * 2.0) * 0.5 + 0.5;
+    vec3 color = mix(uColor1, uColor2, wave);
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
+export class ChocolateShaderMaterial extends ShaderMaterial {
+  constructor() {
+    super({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor1: { value: new THREE.Color('#5e3b2e') }, // 深巧克力
+        uColor2: { value: new THREE.Color('#d8a47f') }, // 奶茶色
+      },
+    });
+  }
+}
+
+// Default export for convenience
+export default ChocolateShaderMaterial;
