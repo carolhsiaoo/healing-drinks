@@ -108,13 +108,42 @@ function Scene({ cameraControls }: SceneProps) {
   const radius = 3;
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
 
+  // Calculate the reference distance (drink3's distance) for consistency
+  const calculateReferenceDistance = () => {
+    const drink3Index = 2;
+    const angle = (drink3Index / drinks.length) * Math.PI * 2;
+    const orbitRadius = 2.5;
+    const x = Math.sin(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionX;
+    const z = Math.cos(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionZ;
+    const y = cameraControls.positionY;
+    
+    // Calculate distance from camera to focused drink position [0, 1, 0]
+    const focusedDrinkPos = new THREE.Vector3(0, 1, 0);
+    const cameraPos = new THREE.Vector3(x, y, z);
+    return cameraPos.distanceTo(focusedDrinkPos);
+  };
+
   useFrame(() => {
     if (!cameraRef.current) return;
     const angle = (focusedIndex / drinks.length) * Math.PI * 2;
     const orbitRadius = 2.5;
+    
+    // Calculate desired camera position based on angle
     const x = Math.sin(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionX;
     const z = Math.cos(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionZ;
-    const target = new THREE.Vector3(x, cameraControls.positionY, z);
+    const y = cameraControls.positionY;
+    
+    // Calculate current distance and reference distance
+    const focusedDrinkPos = new THREE.Vector3(0, 1, 0);
+    const currentCameraPos = new THREE.Vector3(x, y, z);
+    const currentDistance = currentCameraPos.distanceTo(focusedDrinkPos);
+    const referenceDistance = calculateReferenceDistance();
+    
+    // Adjust camera position to maintain consistent distance
+    const direction = currentCameraPos.clone().sub(focusedDrinkPos).normalize();
+    const adjustedCameraPos = focusedDrinkPos.clone().add(direction.multiplyScalar(referenceDistance));
+    
+    const target = new THREE.Vector3(adjustedCameraPos.x, adjustedCameraPos.y, adjustedCameraPos.z);
     cameraRef.current.position.lerp(target, 0.1);
     cameraRef.current.lookAt(0, cameraControls.lookAtY, 0);
     cameraRef.current.fov = cameraControls.fov;
