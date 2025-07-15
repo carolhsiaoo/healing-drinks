@@ -93,9 +93,10 @@ interface SceneProps {
     lookAtY: number;
     fov: number;
   };
+  onFocusChange: (index: number) => void;
 }
 
-function Scene({ cameraControls }: SceneProps) {
+function Scene({ cameraControls, onFocusChange }: SceneProps) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const drinks = [
     '/drink1.glb',
@@ -103,6 +104,14 @@ function Scene({ cameraControls }: SceneProps) {
     '/drink3.glb',
     '/drink4.glb',
     '/drink5.glb',
+  ];
+  
+  const drinkNames = [
+    'macchiato',
+    'latte', 
+    'milk',
+    'smoothie',
+    'lemonade'
   ];
 
   const radius = 3;
@@ -178,7 +187,10 @@ function Scene({ cameraControls }: SceneProps) {
             position={position}
             index={i}
             focusedIndex={focusedIndex}
-            onClick={(idx: number) => setFocusedIndex(idx)}
+            onClick={(idx: number) => {
+              setFocusedIndex(idx);
+              onFocusChange(idx);
+            }}
           />
         );
       })}
@@ -187,6 +199,15 @@ function Scene({ cameraControls }: SceneProps) {
 }
 
 export default function App() {
+  const [focusedDrinkIndex, setFocusedDrinkIndex] = useState(0);
+  const drinkNames = [
+    'macchiato',
+    'latte', 
+    'milk',
+    'smoothie',
+    'lemonade'
+  ];
+  
   const cameraControls = useControls('Camera', {
     positionX: { value: 0.4, min: -10, max: 10, step: 0.1 },
     positionY: { value: 2.2, min: 0, max: 10, step: 0.1 },
@@ -203,17 +224,54 @@ export default function App() {
 
 
   return (
-    <Canvas
-      style={{ width: '100vw', height: '100vh' }}
-      camera={{ 
-        position: [cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ], 
-        fov: cameraControls.fov 
-      }}
-    >
-      <Suspense fallback={null}>
-        <Scene cameraControls={cameraControls} />
-        <OrbitControls enableZoom={false} />
-      </Suspense>
-    </Canvas>
+    <div style={{ width: '100vw', height: '100vh', backgroundColor: 'white', position: 'relative' }}>
+      <Canvas
+        style={{ width: '100vw', height: '100vh', zIndex: 10, position: 'relative' }}
+        camera={{ 
+          position: [cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ], 
+          fov: cameraControls.fov 
+        }}
+      >
+        <Suspense fallback={null}>
+          <Scene cameraControls={cameraControls} onFocusChange={setFocusedDrinkIndex} />
+          <OrbitControls enableZoom={false} />
+        </Suspense>
+      </Canvas>
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '0',
+        width: '100vw',
+        height: '60px',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        zIndex: 1,
+        pointerEvents: 'none'
+      }}>
+        <div 
+          key={focusedDrinkIndex}
+          style={{
+          display: 'flex',
+          whiteSpace: 'nowrap',
+          animation: 'scroll 15s linear infinite',
+          color: 'black',
+          fontSize: '40px',
+          fontWeight: 'bold',
+          fontFamily: 'monospace',
+          textShadow: '2px 2px 4px rgba(255,255,255,0.8)'
+        }}>
+          {Array(20).fill(drinkNames[focusedDrinkIndex]).join(' • ')}
+        </div>
+      </div>
+      <style>
+        {`
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}
+      </style>
+    </div>
   );
 }
