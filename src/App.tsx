@@ -3,6 +3,7 @@ import { OrbitControls, useGLTF, PerspectiveCamera, Environment } from '@react-t
 import { Suspense, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useControls } from 'leva';
+import { useNavigate } from 'react-router-dom';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts'; // ⬅️ 自定義 Shader Material 匯入
 
 interface DrinkProps {
@@ -200,6 +201,7 @@ function Scene({ cameraControls, onFocusChange }: SceneProps) {
 
 export default function App() {
   const [focusedDrinkIndex, setFocusedDrinkIndex] = useState(0);
+  const navigate = useNavigate();
   const drinkNames = [
     'macchiato',
     'latte', 
@@ -237,6 +239,39 @@ export default function App() {
           <OrbitControls enableZoom={false} />
         </Suspense>
       </Canvas>
+      <button
+        onClick={() => navigate(`/drink/${focusedDrinkIndex}`)}
+        style={{
+          position: 'absolute',
+          top: '80%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          padding: '15px 30px',
+          fontSize: '18px',
+          fontWeight: 'bold',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          border: '2px solid white',
+          borderRadius: '30px',
+          cursor: 'pointer',
+          zIndex: 20,
+          transition: 'all 0.3s ease',
+          textTransform: 'uppercase',
+          letterSpacing: '2px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'white';
+          e.currentTarget.style.color = 'black';
+          e.currentTarget.style.borderColor = 'black';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+          e.currentTarget.style.color = 'white';
+          e.currentTarget.style.borderColor = 'white';
+        }}
+      >
+        View {drinkNames[focusedDrinkIndex]}
+      </button>
       <div style={{
         position: 'absolute',
         top: '50%',
