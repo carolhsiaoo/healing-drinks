@@ -3,8 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
 import { Suspense, useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { useControls } from 'leva';
-import { MovingBlurBackground } from './MovingBlurBackground';
+import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
 
 interface DrinkModelProps {
@@ -113,7 +112,7 @@ export default function DrinkDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
-  const drinkId = parseInt(id || '0');
+  const drinkId = parseInt(id || '0', 10);
   const drinks = [
     '/drink1.glb',
     '/drink2.glb',
@@ -140,23 +139,42 @@ export default function DrinkDetail() {
 
 
   const drinkBackgroundColors = [
-    { c1: '#FFE6D9', c2: '#E6F2FF', c3: '#FFFCCC' }, // macchiato
-    { c1: '#FFF5E6', c2: '#F0E6D2', c3: '#FFE6CC' }, // latte
-    { c1: '#F0F0F0', c2: '#FFFFFF', c3: '#E6E6E6' }, // milk
-    { c1: '#FFE6E6', c2: '#FFD9D9', c3: '#FFCCCC' }, // smoothie
-    { c1: '#F0FFE6', c2: '#E6FFD9', c3: '#CCFFCC' }, // lemonade
+    { 
+      baseColor: '#FFE6D9', 
+      highlightColor: '#FFDACC', 
+      midtoneColor: '#E6F2FF', 
+      lowlightColor: '#FFFCCC' 
+    }, // macchiato - warm coffee tones
+    { 
+      baseColor: '#FFF5E6', 
+      highlightColor: '#F0E6D2', 
+      midtoneColor: '#FFE6CC', 
+      lowlightColor: '#FFEEDD' 
+    }, // latte - creamy coffee tones
+    { 
+      baseColor: '#F0F0F0', 
+      highlightColor: '#FFFFFF', 
+      midtoneColor: '#E6E6E6', 
+      lowlightColor: '#F5F5F5' 
+    }, // milk - pure white tones
+    { 
+      baseColor: '#FFE6E6', 
+      highlightColor: '#FFD9D9', 
+      midtoneColor: '#FFCCCC', 
+      lowlightColor: '#FFEBEB' 
+    }, // smoothie - berry tones
+    { 
+      baseColor: '#F0FFE6', 
+      highlightColor: '#E6FFD9', 
+      midtoneColor: '#CCFFCC', 
+      lowlightColor: '#F5FFF0' 
+    }, // lemonade - citrus tones
   ];
 
   const currentColors = drinkBackgroundColors[drinkId] || drinkBackgroundColors[0];
-
-  const backgroundControls = useControls('Background', {
-    color1: { value: currentColors.c1 },
-    color2: { value: currentColors.c2 },
-    color3: { value: currentColors.c3 },
-    speed: { value: 0.05, min: 0, max: 0.2, step: 0.01 },
-    waveFreq: { value: 3.0, min: 0.5, max: 10, step: 0.1 },
-    mixStrength: { value: 1.0, min: 0, max: 2, step: 0.1 },
-  });
+  
+  console.log('DrinkDetail - Current drink ID:', drinkId);
+  console.log('DrinkDetail - Current colors:', currentColors);
 
   if (drinkId < 0 || drinkId >= drinks.length) {
     return <div>Drink not found</div>;
@@ -174,24 +192,13 @@ export default function DrinkDetail() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <div style={{ 
-        position: 'absolute', 
-        width: '100vw', 
-        height: '100vh', 
-        zIndex: -1,
-        filter: 'blur(40px)'
-      }}>
-        <Canvas camera={{ position: [0, 0, 1] }}>
-          <MovingBlurBackground 
-            color1={backgroundControls.color1}
-            color2={backgroundControls.color2}
-            color3={backgroundControls.color3}
-            speed={backgroundControls.speed}
-            waveFreq={backgroundControls.waveFreq}
-            mixStrength={backgroundControls.mixStrength}
-          />
-        </Canvas>
-      </div>
+      <VantaFog 
+        baseColor={currentColors.baseColor}
+        highlightColor={currentColors.highlightColor}
+        midtoneColor={currentColors.midtoneColor}
+        lowlightColor={currentColors.lowlightColor}
+        enableControls={true}
+      />
       <button
         onClick={() => navigate('/')}
         style={{

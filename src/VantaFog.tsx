@@ -1,17 +1,36 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import VANTA from 'vanta/dist/vanta.fog.min';
 import * as THREE from 'three';
 import { useControls } from 'leva';
 
-const VantaFog = () => {
+interface VantaFogProps {
+  baseColor?: string;
+  highlightColor?: string;
+  midtoneColor?: string;
+  lowlightColor?: string;
+  enableControls?: boolean;
+}
+
+const VantaFog = ({ 
+  baseColor = '#fffbfa',
+  highlightColor = '#f2e8e6',
+  midtoneColor = '#a1c7ef',
+  lowlightColor = '#e3f4fc',
+  enableControls = true
+}: VantaFogProps) => {
+  console.log('VantaFog - Received props:', { baseColor, highlightColor, midtoneColor, lowlightColor });
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffect = useRef<ReturnType<typeof VANTA> | null>(null);
+  
+  // Use state to track current colors
+  const [currentColors, setCurrentColors] = useState({
+    base: baseColor,
+    highlight: highlightColor,
+    midtone: midtoneColor,
+    lowlight: lowlightColor
+  });
 
   const controls = useControls('Vanta Fog', {
-    baseColor: { value: '#fffbfa' }, // 16772075 in hex
-    highlightColor: { value: '#f2e8e6' }, // 14606046 in hex
-    midtoneColor: { value: '#a1c7ef' }, // 13816530 in hex
-    lowlightColor: { value: '#e3f4fc' }, // 9671571 in hex
     blurFactor: { value: 0.6, min: 0, max: 1, step: 0.1 },
     speed: { value: 1, min: 0, max: 5, step: 0.1 },
     zoom: { value: 1, min: 0.1, max: 3, step: 0.1 },
@@ -20,14 +39,31 @@ const VantaFog = () => {
     mouseControls: true,
     touchControls: true,
     gyroControls: false,
-  });
+  }, { collapsed: !enableControls });
 
+  // Update colors when props change
+  useEffect(() => {
+    console.log('VantaFog - Props changed, updating colors');
+    setCurrentColors({
+      base: baseColor,
+      highlight: highlightColor,
+      midtone: midtoneColor,
+      lowlight: lowlightColor
+    });
+  }, [baseColor, highlightColor, midtoneColor, lowlightColor]);
+
+  // Initialize and update Vanta effect
   useEffect(() => {
     if (!vantaRef.current) return;
 
-    if (vantaEffect.current) vantaEffect.current.destroy();
+    // Clean up previous effect
+    if (vantaEffect.current) {
+      vantaEffect.current.destroy();
+      vantaEffect.current = null;
+    }
 
     try {
+      console.log('VantaFog - Creating new effect with colors:', currentColors);
       vantaEffect.current = VANTA({
         el: vantaRef.current,
         THREE: THREE,
@@ -36,10 +72,10 @@ const VantaFog = () => {
         gyroControls: controls.gyroControls,
         minHeight: 200.00,
         minWidth: 200.00,
-        baseColor: controls.baseColor,
-        highlightColor: controls.highlightColor,
-        midtoneColor: controls.midtoneColor,
-        lowlightColor: controls.lowlightColor,
+        baseColor: currentColors.base,
+        highlightColor: currentColors.highlight,
+        midtoneColor: currentColors.midtone,
+        lowlightColor: currentColors.lowlight,
         blurFactor: controls.blurFactor,
         speed: controls.speed,
         zoom: controls.zoom,
@@ -52,13 +88,13 @@ const VantaFog = () => {
     }
 
     return () => {
-      if (vantaEffect.current) vantaEffect.current.destroy();
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy();
+        vantaEffect.current = null;
+      }
     };
   }, [
-    controls.baseColor,
-    controls.highlightColor,
-    controls.midtoneColor,
-    controls.lowlightColor,
+    currentColors,
     controls.blurFactor,
     controls.speed,
     controls.zoom,
