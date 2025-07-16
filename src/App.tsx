@@ -4,7 +4,8 @@ import { Suspense, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useControls } from 'leva';
 import { useNavigate } from 'react-router-dom';
-import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts'; // ⬅️ 自定義 Shader Material 匯入
+import VantaClouds from './VantaClouds';
+import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
 
 interface DrinkProps {
   modelPath: string;
@@ -24,14 +25,16 @@ function Drink({ modelPath, position, index, focusedIndex, onClick }: DrinkProps
       let chocolateCount = 0;
       let glassCount = 0;
       
-      scene.traverse((child: any) => {
-        if (child.isMesh && child.material) {
-          const name = child.material.name?.toLowerCase() || '';
-          const exactName = child.material.name || '';
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
+          const mesh = child as THREE.Mesh;
+          const material = mesh.material as THREE.Material;
+          const name = material.name?.toLowerCase() || '';
+          const exactName = material.name || '';
 
           if (name.includes('glass')) {
             glassCount++;
-            child.material = new THREE.MeshPhysicalMaterial({
+            mesh.material = new THREE.MeshPhysicalMaterial({
               color: 0xffffff,
               metalness: 0,
               roughness: 0,
@@ -44,10 +47,10 @@ function Drink({ modelPath, position, index, focusedIndex, onClick }: DrinkProps
             });
           } else if (exactName === 'CHOCOLATE.005' || exactName === 'CHOCOLATE.007') {
             chocolateCount++;
-            console.log(`🍫 Applied chocolate shader to: ${child.material.name} in ${modelPath} (index: ${index})`);
+            console.log(`🍫 Applied chocolate shader to: ${material.name} in ${modelPath} (index: ${index})`);
             
             const newMaterial = new ChocolateShaderMaterial();
-            child.material = newMaterial;
+            mesh.material = newMaterial;
           }
         }
       });
@@ -106,54 +109,17 @@ function Scene({ cameraControls, onFocusChange }: SceneProps) {
     '/drink4.glb',
     '/drink5.glb',
   ];
-  
-  const drinkNames = [
-    'macchiato',
-    'latte', 
-    'milk',
-    'smoothie',
-    'lemonade'
-  ];
 
   const radius = 3;
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
-
-  // Calculate the reference distance (drink3's distance) for consistency
-  const calculateReferenceDistance = () => {
-    const drink3Index = 2;
-    const angle = (drink3Index / drinks.length) * Math.PI * 2;
-    const orbitRadius = 2.5;
-    const x = Math.sin(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionX;
-    const z = Math.cos(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionZ;
-    const y = cameraControls.positionY;
-    
-    // Calculate distance from camera to focused drink position [0, 1, 0]
-    const focusedDrinkPos = new THREE.Vector3(0, 1, 0);
-    const cameraPos = new THREE.Vector3(x, y, z);
-    return cameraPos.distanceTo(focusedDrinkPos);
-  };
 
   useFrame(() => {
     if (!cameraRef.current) return;
     const angle = (focusedIndex / drinks.length) * Math.PI * 2;
     const orbitRadius = 2.5;
-    
-    // Calculate desired camera position based on angle
     const x = Math.sin(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionX;
     const z = Math.cos(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionZ;
-    const y = cameraControls.positionY;
-    
-    // Calculate current distance and reference distance
-    const focusedDrinkPos = new THREE.Vector3(0, 1, 0);
-    const currentCameraPos = new THREE.Vector3(x, y, z);
-    const currentDistance = currentCameraPos.distanceTo(focusedDrinkPos);
-    const referenceDistance = calculateReferenceDistance();
-    
-    // Adjust camera position to maintain consistent distance
-    const direction = currentCameraPos.clone().sub(focusedDrinkPos).normalize();
-    const adjustedCameraPos = focusedDrinkPos.clone().add(direction.multiplyScalar(referenceDistance));
-    
-    const target = new THREE.Vector3(adjustedCameraPos.x, adjustedCameraPos.y, adjustedCameraPos.z);
+    const target = new THREE.Vector3(x, cameraControls.positionY, z);
     cameraRef.current.position.lerp(target, 0.1);
     cameraRef.current.lookAt(0, cameraControls.lookAtY, 0);
     cameraRef.current.fov = cameraControls.fov;
@@ -219,14 +185,9 @@ export default function App() {
     fov: { value: 50, min: 10, max: 120, step: 1 },
   });
 
-
-
-
-
-
-
   return (
-    <div style={{ width: '100vw', height: '100vh', backgroundColor: 'white', position: 'relative' }}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <VantaClouds />
       <Canvas
         style={{ width: '100vw', height: '100vh', zIndex: 10, position: 'relative' }}
         camera={{ 
