@@ -97,10 +97,10 @@ function DrinkModel({ modelPath }: DrinkModelProps) {
 
 // Preload all drink models
 const drinkPaths = [
-  '/drink1.glb',
+  '/drink4.glb',
   '/drink2.glb',
   '/drink3.glb',
-  '/drink4.glb',
+  '/drink1.glb',
   '/drink5.glb',
 ];
 
@@ -114,60 +114,60 @@ export default function DrinkDetail() {
   
   const drinkId = parseInt(id || '0', 10);
   const drinks = [
-    '/drink1.glb',
+    '/drink4.glb',
     '/drink2.glb',
     '/drink3.glb',
-    '/drink4.glb',
+    '/drink1.glb',
     '/drink5.glb',
   ];
   
   const drinkNames = [
-    'macchiato',
+    'smoothie',
     'latte', 
     'milk',
-    'smoothie',
+    'macchiato',
     'lemonade'
   ];
 
   const drinkDescriptions = [
-    'A rich espresso topped with a dollop of steamed milk foam',
+    'A blend of fresh fruits and yogurt for a healthy treat',
     'Smooth espresso balanced with creamy steamed milk',
     'Pure, refreshing whole milk served chilled',
-    'A blend of fresh fruits and yogurt for a healthy treat',
+    'A rich espresso topped with a dollop of steamed milk foam',
     'Tangy and sweet, made with freshly squeezed lemons'
   ];
 
 
   const drinkBackgroundColors = [
     { 
-      baseColor: '#FFE6D9', 
-      highlightColor: '#FFDACC', 
-      midtoneColor: '#E6F2FF', 
-      lowlightColor: '#FFFCCC' 
-    }, // macchiato - warm coffee tones
+      baseColor: '#f5f5f5',
+      highlightColor: '#e59292',
+      midtoneColor: '#ffffff', 
+      lowlightColor: '#c1c1c1' 
+    }, // smoothie - berry tones
     { 
-      baseColor: '#FFF5E6', 
-      highlightColor: '#F0E6D2', 
-      midtoneColor: '#FFE6CC', 
-      lowlightColor: '#FFEEDD' 
+      baseColor: '#ffffff',
+      highlightColor: '#e6c3ae',
+      midtoneColor: '#e2e2e2',
+      lowlightColor: '#fcfffa'
     }, // latte - creamy coffee tones
     { 
-      baseColor: '#F0F0F0', 
-      highlightColor: '#FFFFFF', 
-      midtoneColor: '#E6E6E6', 
+      baseColor: '#f8f8f8', 
+      highlightColor: '#315dce', 
+      midtoneColor: '#e6e6e6', 
       lowlightColor: '#F5F5F5' 
     }, // milk - pure white tones
     { 
-      baseColor: '#FFE6E6', 
-      highlightColor: '#FFD9D9', 
-      midtoneColor: '#FFCCCC', 
-      lowlightColor: '#FFEBEB' 
-    }, // smoothie - berry tones
+      baseColor: '#ffffff', 
+      highlightColor: '#cbcbcb', 
+      midtoneColor: '#e5b485', 
+      lowlightColor: '#ffffff' 
+    }, // macchiato - warm coffee tones
     { 
-      baseColor: '#F0FFE6', 
-      highlightColor: '#E6FFD9', 
-      midtoneColor: '#CCFFCC', 
-      lowlightColor: '#F5FFF0' 
+      baseColor: '#efefef', 
+      highlightColor: '#e3e87d', 
+      midtoneColor: '#73ce94', 
+      lowlightColor: '#bebebe' 
     }, // lemonade - citrus tones
   ];
 
@@ -374,3 +374,4 @@ export default function DrinkDetail() {
     </div>
   );
 }
+

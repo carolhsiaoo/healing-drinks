@@ -103,10 +103,10 @@ interface SceneProps {
 function Scene({ cameraControls, onFocusChange }: SceneProps) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const drinks = [
-    '/drink1.glb',
+    '/drink4.glb',
     '/drink2.glb',
     '/drink3.glb',
-    '/drink4.glb',
+    '/drink1.glb',
     '/drink5.glb',
   ];
 
@@ -175,10 +175,10 @@ export default function App() {
   const [focusedDrinkIndex, setFocusedDrinkIndex] = useState(0);
   const navigate = useNavigate();
   const drinkNames = [
-    'macchiato',
+    'smoothie',
     'latte', 
     'milk',
-    'smoothie',
+    'macchiato',
     'lemonade'
   ];
   
@@ -193,7 +193,13 @@ export default function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <VantaFog />
+      <VantaFog 
+        baseColor="#fffbfa"
+        highlightColor="#f2e8e6"
+        midtoneColor="#a1c7ef"
+        lowlightColor="#e3f4fc"
+        enableControls={true}
+      />
       <Canvas
         style={{ width: '100vw', height: '100vh', zIndex: 10, position: 'relative' }}
         camera={{ 

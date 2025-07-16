@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import VANTA from 'vanta/dist/vanta.fog.min';
 import * as THREE from 'three';
 import { useControls } from 'leva';
@@ -21,17 +21,13 @@ const VantaFog = ({
   console.log('VantaFog - Received props:', { baseColor, highlightColor, midtoneColor, lowlightColor });
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffect = useRef<ReturnType<typeof VANTA> | null>(null);
-  
-  // Use state to track current colors
-  const [currentColors, setCurrentColors] = useState({
-    base: baseColor,
-    highlight: highlightColor,
-    midtone: midtoneColor,
-    lowlight: lowlightColor
-  });
 
-  const controls = useControls('Vanta Fog', {
-    blurFactor: { value: 0.6, min: 0, max: 1, step: 0.1 },
+  const [controls, set] = useControls('Vanta Fog', () => ({
+    baseColor: { value: baseColor },
+    highlightColor: { value: highlightColor },
+    midtoneColor: { value: midtoneColor },
+    lowlightColor: { value: lowlightColor },
+    blurFactor: { value: 0.8, min: 0, max: 1, step: 0.1 },
     speed: { value: 1, min: 0, max: 5, step: 0.1 },
     zoom: { value: 1, min: 0.1, max: 3, step: 0.1 },
     scale: { value: 2, min: 1, max: 10, step: 0.5 },
@@ -39,18 +35,19 @@ const VantaFog = ({
     mouseControls: true,
     touchControls: true,
     gyroControls: false,
-  }, { collapsed: !enableControls });
+  }), { collapsed: !enableControls });
 
-  // Update colors when props change
+  // Update Leva controls when props change
   useEffect(() => {
-    console.log('VantaFog - Props changed, updating colors');
-    setCurrentColors({
-      base: baseColor,
-      highlight: highlightColor,
-      midtone: midtoneColor,
-      lowlight: lowlightColor
+    console.log('VantaFog - Props changed, updating Leva controls');
+    // Update Leva controls to reflect new prop values
+    set({
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      midtoneColor: midtoneColor,
+      lowlightColor: lowlightColor
     });
-  }, [baseColor, highlightColor, midtoneColor, lowlightColor]);
+  }, [baseColor, highlightColor, midtoneColor, lowlightColor, set]);
 
   // Initialize and update Vanta effect
   useEffect(() => {
@@ -63,7 +60,12 @@ const VantaFog = ({
     }
 
     try {
-      console.log('VantaFog - Creating new effect with colors:', currentColors);
+      console.log('VantaFog - Creating new effect with colors:', {
+        baseColor: controls.baseColor,
+        highlightColor: controls.highlightColor,
+        midtoneColor: controls.midtoneColor,
+        lowlightColor: controls.lowlightColor
+      });
       vantaEffect.current = VANTA({
         el: vantaRef.current,
         THREE: THREE,
@@ -72,10 +74,10 @@ const VantaFog = ({
         gyroControls: controls.gyroControls,
         minHeight: 200.00,
         minWidth: 200.00,
-        baseColor: currentColors.base,
-        highlightColor: currentColors.highlight,
-        midtoneColor: currentColors.midtone,
-        lowlightColor: currentColors.lowlight,
+        baseColor: controls.baseColor,
+        highlightColor: controls.highlightColor,
+        midtoneColor: controls.midtoneColor,
+        lowlightColor: controls.lowlightColor,
         blurFactor: controls.blurFactor,
         speed: controls.speed,
         zoom: controls.zoom,
@@ -94,7 +96,10 @@ const VantaFog = ({
       }
     };
   }, [
-    currentColors,
+    controls.baseColor,
+    controls.highlightColor,
+    controls.midtoneColor,
+    controls.lowlightColor,
     controls.blurFactor,
     controls.speed,
     controls.zoom,
