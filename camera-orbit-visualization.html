@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Orbit Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        .value {
+            font-size: 12px;
+            color: #666;
+        }
+        .legend {
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Camera Orbit Visualization</h2>
+        <div class="controls">
+            <div class="control-group">
+                <label>Position X Offset</label>
+                <input type="range" id="posX" min="-5" max="5" step="0.1" value="0.4">
+                <span class="value" id="posXValue">0.4</span>
+            </div>
+            <div class="control-group">
+                <label>Position Z Offset</label>
+                <input type="range" id="posZ" min="-5" max="5" step="0.1" value="2.2">
+                <span class="value" id="posZValue">2.2</span>
+            </div>
+            <div class="control-group">
+                <label>Orbit Multiplier</label>
+                <input type="range" id="orbitMult" min="1" max="5" step="0.1" value="3.0">
+                <span class="value" id="orbitMultValue">3.0</span>
+            </div>
+        </div>
+        <canvas id="canvas" width="600" height="600"></canvas>
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ff0000;"></span>Drinks
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #0000ff;"></span>Camera Positions
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #00ff00;"></span>Center (0,0)
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ff00ff;"></span>Orbit Center
+            </div>
+        </div>
+        <div id="distances" style="margin-top: 10px; font-size: 14px;"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const posXSlider = document.getElementById('posX');
+        const posZSlider = document.getElementById('posZ');
+        const orbitMultSlider = document.getElementById('orbitMult');
+        const posXValue = document.getElementById('posXValue');
+        const posZValue = document.getElementById('posZValue');
+        const orbitMultValue = document.getElementById('orbitMultValue');
+        const distancesDiv = document.getElementById('distances');
+
+        function drawScene() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 30; // pixels per unit
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            ctx.strokeStyle = '#eee';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 20; i++) {
+                const pos = i * 30;
+                ctx.beginPath();
+                ctx.moveTo(pos, 0);
+                ctx.lineTo(pos, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, pos);
+                ctx.lineTo(canvas.width, pos);
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Get values
+            const posX = parseFloat(posXSlider.value);
+            const posZ = parseFloat(posZSlider.value);
+            const orbitMult = parseFloat(orbitMultSlider.value);
+            const orbitRadius = 2.5;
+            
+            // Draw center (0,0)
+            ctx.fillStyle = '#00ff00';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillText('(0,0)', centerX + 10, centerY - 10);
+            
+            // Draw orbit center
+            const orbitCenterX = centerX + posX * scale;
+            const orbitCenterY = centerY - posZ * scale;
+            ctx.fillStyle = '#ff00ff';
+            ctx.beginPath();
+            ctx.arc(orbitCenterX, orbitCenterY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillText(`(${posX},${posZ})`, orbitCenterX + 10, orbitCenterY - 10);
+            
+            // Draw drinks (at radius 3 from center)
+            const drinkRadius = 3;
+            const drinkNames = ['macchiato', 'latte', 'milk', 'smoothie', 'lemonade'];
+            let distances = [];
+            
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                
+                // Drink position
+                const drinkX = Math.sin(angle) * drinkRadius;
+                const drinkZ = Math.cos(angle) * drinkRadius;
+                const drinkScreenX = centerX + drinkX * scale;
+                const drinkScreenY = centerY - drinkZ * scale;
+                
+                // Camera position
+                const cameraX = Math.sin(angle) * orbitRadius * orbitMult + posX;
+                const cameraZ = Math.cos(angle) * orbitRadius * orbitMult + posZ;
+                const cameraScreenX = centerX + cameraX * scale;
+                const cameraScreenY = centerY - cameraZ * scale;
+                
+                // Draw drink
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(drinkScreenX, drinkScreenY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.font = '12px Arial';
+                ctx.fillText(`D${i}`, drinkScreenX - 7, drinkScreenY + 4);
+                
+                // Draw camera position
+                ctx.fillStyle = '#0000ff';
+                ctx.beginPath();
+                ctx.arc(cameraScreenX, cameraScreenY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.font = '10px Arial';
+                ctx.fillText(`C${i}`, cameraScreenX - 6, cameraScreenY + 3);
+                
+                // Draw line from camera to center
+                ctx.strokeStyle = '#0000ff33';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(cameraScreenX, cameraScreenY);
+                ctx.lineTo(centerX, centerY);
+                ctx.stroke();
+                
+                // Calculate distance from camera to center
+                const distance = Math.sqrt(cameraX * cameraX + cameraZ * cameraZ);
+                distances.push({
+                    name: drinkNames[i],
+                    distance: distance.toFixed(2)
+                });
+            }
+            
+            // Draw camera orbit circle
+            ctx.strokeStyle = '#0000ff44';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(orbitCenterX, orbitCenterY, orbitRadius * orbitMult * scale, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Draw drink circle
+            ctx.strokeStyle = '#ff000044';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, drinkRadius * scale, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Update distances display
+            distancesDiv.innerHTML = '<strong>Camera distances from center:</strong><br>' +
+                distances.map((d, i) => `Drink ${i} (${d.name}): ${d.distance} units`).join('<br>');
+        }
+        
+        // Update value displays and redraw
+        posXSlider.oninput = function() {
+            posXValue.textContent = this.value;
+            drawScene();
+        };
+        
+        posZSlider.oninput = function() {
+            posZValue.textContent = this.value;
+            drawScene();
+        };
+        
+        orbitMultSlider.oninput = function() {
+            orbitMultValue.textContent = this.value;
+            drawScene();
+        };
+        
+        // Initial draw
+        drawScene();
+    </script>
+</body>
+</html>

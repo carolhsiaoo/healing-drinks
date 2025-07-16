@@ -4,7 +4,7 @@ import { Suspense, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useControls } from 'leva';
 import { useNavigate } from 'react-router-dom';
-import VantaClouds from './VantaClouds';
+import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
 
 interface DrinkProps {
@@ -116,10 +116,16 @@ function Scene({ cameraControls, onFocusChange }: SceneProps) {
   useFrame(() => {
     if (!cameraRef.current) return;
     const angle = (focusedIndex / drinks.length) * Math.PI * 2;
-    const orbitRadius = 2.5;
-    const x = Math.sin(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionX;
-    const z = Math.cos(angle) * orbitRadius * cameraControls.orbitMultiplier + cameraControls.positionZ;
-    const target = new THREE.Vector3(x, cameraControls.positionY, z);
+    const orbitRadius = 2.5 * cameraControls.orbitMultiplier;
+    // Calculate camera position relative to origin (0, 0, 0) for consistent distances
+    const x = Math.sin(angle) * orbitRadius;
+    const z = Math.cos(angle) * orbitRadius;
+    // Add initial offset after calculating the orbit position
+    const target = new THREE.Vector3(
+      x + cameraControls.positionX,
+      cameraControls.positionY,
+      z + cameraControls.positionZ
+    );
     cameraRef.current.position.lerp(target, 0.1);
     cameraRef.current.lookAt(0, cameraControls.lookAtY, 0);
     cameraRef.current.fov = cameraControls.fov;
@@ -177,17 +183,17 @@ export default function App() {
   ];
   
   const cameraControls = useControls('Camera', {
-    positionX: { value: 0.4, min: -10, max: 10, step: 0.1 },
+    positionX: { value: 0, min: -10, max: 10, step: 0.1 },
     positionY: { value: 2.2, min: 0, max: 10, step: 0.1 },
-    positionZ: { value: 2.2, min: 0, max: 10, step: 0.1 },
+    positionZ: { value: 0, min: -10, max: 10, step: 0.1 },
     orbitMultiplier: { value: 3.0, min: 0.5, max: 3, step: 0.1 },
     lookAtY: { value: 0.1, min: -2, max: 5, step: 0.1 },
-    fov: { value: 50, min: 10, max: 120, step: 1 },
+    fov: { value: 35, min: 10, max: 120, step: 1 },
   });
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <VantaClouds />
+      <VantaFog />
       <Canvas
         style={{ width: '100vw', height: '100vh', zIndex: 10, position: 'relative' }}
         camera={{ 

@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
-import { Suspense, useRef } from 'react';
+import { Suspense, useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import HolographicBackground from './HolographicBackground';
+import { useControls } from 'leva';
+import { MovingBlurBackground } from './MovingBlurBackground';
+import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
 
 interface DrinkModelProps {
   modelPath: string;
@@ -46,6 +48,39 @@ function Loader() {
 function DrinkModel({ modelPath }: DrinkModelProps) {
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF(modelPath);
+
+  // Material replacement logic - same as in App.tsx
+  useEffect(() => {
+    try {
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
+          const mesh = child as THREE.Mesh;
+          const material = mesh.material as THREE.Material;
+          const name = material.name?.toLowerCase() || '';
+          const exactName = material.name || '';
+
+          if (name.includes('glass')) {
+            mesh.material = new THREE.MeshPhysicalMaterial({
+              color: 0xffffff,
+              metalness: 0,
+              roughness: 0,
+              transmission: 1,
+              thickness: 0.5,
+              ior: 1.5,
+              transparent: true,
+              clearcoat: 1,
+              clearcoatRoughness: 0.1,
+            });
+          } else if (exactName === 'CHOCOLATE.005' || exactName === 'CHOCOLATE.007') {
+            const newMaterial = new ChocolateShaderMaterial();
+            mesh.material = newMaterial;
+          }
+        }
+      });
+    } catch (error) {
+      console.error(`Error processing materials for ${modelPath}:`, error);
+    }
+  }, [scene, modelPath]);
 
   // Add rotation animation
   useFrame((state) => {
@@ -103,13 +138,25 @@ export default function DrinkDetail() {
     'Tangy and sweet, made with freshly squeezed lemons'
   ];
 
-  const drinkColors = [
-    { primary: '#8B6148', secondary: '#FCF2DA' }, // Drink 1
-    { primary: '#8B7948', secondary: '#FFFADB' }, // Drink 2
-    { primary: '#3D3D3D', secondary: '#F0F0F0' }, // Drink 3
-    { primary: '#C22D2D', secondary: '#FFF0F0' }, // Drink 4
-    { primary: '#72AD13', secondary: '#F1F6E2' }, // Drink 5
+
+  const drinkBackgroundColors = [
+    { c1: '#FFE6D9', c2: '#E6F2FF', c3: '#FFFCCC' }, // macchiato
+    { c1: '#FFF5E6', c2: '#F0E6D2', c3: '#FFE6CC' }, // latte
+    { c1: '#F0F0F0', c2: '#FFFFFF', c3: '#E6E6E6' }, // milk
+    { c1: '#FFE6E6', c2: '#FFD9D9', c3: '#FFCCCC' }, // smoothie
+    { c1: '#F0FFE6', c2: '#E6FFD9', c3: '#CCFFCC' }, // lemonade
   ];
+
+  const currentColors = drinkBackgroundColors[drinkId] || drinkBackgroundColors[0];
+
+  const backgroundControls = useControls('Background', {
+    color1: { value: currentColors.c1 },
+    color2: { value: currentColors.c2 },
+    color3: { value: currentColors.c3 },
+    speed: { value: 0.05, min: 0, max: 0.2, step: 0.01 },
+    waveFreq: { value: 3.0, min: 0.5, max: 10, step: 0.1 },
+    mixStrength: { value: 1.0, min: 0, max: 2, step: 0.1 },
+  });
 
   if (drinkId < 0 || drinkId >= drinks.length) {
     return <div>Drink not found</div>;
@@ -127,10 +174,24 @@ export default function DrinkDetail() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <HolographicBackground 
-        primaryColor={drinkColors[drinkId].primary} 
-        secondaryColor={drinkColors[drinkId].secondary} 
-      />
+      <div style={{ 
+        position: 'absolute', 
+        width: '100vw', 
+        height: '100vh', 
+        zIndex: -1,
+        filter: 'blur(40px)'
+      }}>
+        <Canvas camera={{ position: [0, 0, 1] }}>
+          <MovingBlurBackground 
+            color1={backgroundControls.color1}
+            color2={backgroundControls.color2}
+            color3={backgroundControls.color3}
+            speed={backgroundControls.speed}
+            waveFreq={backgroundControls.waveFreq}
+            mixStrength={backgroundControls.mixStrength}
+          />
+        </Canvas>
+      </div>
       <button
         onClick={() => navigate('/')}
         style={{
@@ -180,7 +241,7 @@ export default function DrinkDetail() {
       </div>
       
       <Canvas
-        style={{ width: '100vw', height: '100vh' }}
+        style={{ width: '100vw', height: '100vh', position: 'relative', zIndex: 1 }}
         camera={{ position: [3, 2, 5], fov: 50 }}
       >
         <Suspense fallback={<Loader />}>
