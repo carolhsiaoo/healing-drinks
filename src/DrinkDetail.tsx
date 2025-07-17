@@ -89,7 +89,7 @@ function DrinkModel({ modelPath }: DrinkModelProps) {
   });
 
   return (
-    <group ref={group} scale={0.3} position={[0, 0, 0]}>
+    <group ref={group} scale={0.5} position={[0, -0.5, 0]}>
       <primitive object={scene} />
     </group>
   );
@@ -130,13 +130,12 @@ export default function DrinkDetail() {
   ];
 
   const drinkDescriptions = [
-    'A blend of fresh fruits and yogurt for a healthy treat',
-    'Smooth espresso balanced with creamy steamed milk',
-    'Pure, refreshing whole milk served chilled',
-    'A rich espresso topped with a dollop of steamed milk foam',
-    'Tangy and sweet, made with freshly squeezed lemons'
+    'Feeling stressed? Try progressive muscle relaxation: Tense and release each muscle group, starting from your toes up to your head. This releases physical tension stored in your body.',
+    'Need a mental reset? Practice the 5-4-3-2-1 grounding technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste.',
+    'Feeling scattered? Try box breathing: Breathe in for 4 counts, hold for 4, exhale for 4, hold for 4. This technique helps regulate your autonomic nervous system.',
+    'Feeling a little overwhelmed? Try the 4-7-8 breathing technique: Breathe in for 4 seconds, hold for 7, exhale for 8. Just a few rounds can reset your nervous system.',
+    'Need instant calm? Try the physiological sigh: Take a double inhale through your nose (one deep, one sip), then a long exhale through your mouth. This maximizes oxygen exchange.'
   ];
-
 
   const drinkBackgroundColors = [
     { 
@@ -159,8 +158,8 @@ export default function DrinkDetail() {
     }, // milk - pure white tones
     { 
       baseColor: '#ffffff', 
-      highlightColor: '#cbcbcb', 
-      midtoneColor: '#e5b485', 
+      highlightColor: '#ffffff', 
+      midtoneColor: '#ffe5cc', 
       lowlightColor: '#ffffff' 
     }, // macchiato - warm coffee tones
     { 
@@ -172,9 +171,6 @@ export default function DrinkDetail() {
   ];
 
   const currentColors = drinkBackgroundColors[drinkId] || drinkBackgroundColors[0];
-  
-  console.log('DrinkDetail - Current drink ID:', drinkId);
-  console.log('DrinkDetail - Current colors:', currentColors);
 
   if (drinkId < 0 || drinkId >= drinks.length) {
     return <div>Drink not found</div>;
@@ -191,7 +187,7 @@ export default function DrinkDetail() {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <VantaFog 
         baseColor={currentColors.baseColor}
         highlightColor={currentColors.highlightColor}
@@ -199,56 +195,145 @@ export default function DrinkDetail() {
         lowlightColor={currentColors.lowlightColor}
         enableControls={true}
       />
-      <button
-        onClick={() => navigate('/')}
-        style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          padding: '10px 20px',
-          fontSize: '16px',
-          backgroundColor: '#333',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          zIndex: 100,
-          transition: 'background-color 0.3s ease'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#555'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#333'}
-      >
-        Back to Menu
-      </button>
-      
+      {/* Header */}
       <div style={{
         position: 'absolute',
-        top: '50%',
-        left: '20px',
-        transform: 'translateY(-50%)',
-        maxWidth: '400px',
+        top: 0,
+        left: 0,
+        right: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '30px 50px',
         zIndex: 100
       }}>
-        <h1 style={{
-          fontSize: '48px',
+        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1a1a1a', margin: 0 }}>Logo</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <span style={{ fontSize: '18px', color: '#1a1a1a' }}>About</span>
+          <span style={{ fontSize: '24px' }}>♪</span>
+        </div>
+      </div>
+
+      {/* Scientific Healing subtitle */}
+      <div style={{
+        position: 'absolute',
+        top: '120px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        textAlign: 'center',
+        zIndex: 100
+      }}>
+        <h3 style={{ 
+          fontSize: '24px', 
+          color: '#8B6F47', 
           fontWeight: 'bold',
-          marginBottom: '20px',
-          color: '#333',
-          textTransform: 'capitalize'
-        }}>
-          {drinkNames[drinkId]}
-        </h1>
+          margin: 0
+        }}>Scientific Healing</h3>
+      </div>
+
+      {/* Drink Title Pattern - Behind everything */}
+      <div style={{
+        position: 'absolute',
+        top: '45%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '200%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        zIndex: 2
+      }}>
+        {/* Repeating horizontal text */}
+        {[...Array(5)].map((_, index) => (
+          <h1 key={index} style={{
+            fontSize: '96px',
+            fontWeight: 'bold',
+            color: '#8B6F47',
+            margin: '0 20px',
+            textTransform: 'capitalize',
+            whiteSpace: 'nowrap'
+          }}>
+            {drinkNames[drinkId]}
+          </h1>
+        ))}
+      </div>
+
+      {/* Navigation Buttons - Centered */}
+      <div style={{
+        position: 'absolute',
+        top: '45%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '600px',
+        zIndex: 15
+      }}>
+        <button
+          onClick={handlePrevious}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            fontSize: '36px',
+            color: '#8B6F47',
+            cursor: 'pointer',
+            padding: '10px',
+            transition: 'opacity 0.3s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        >
+          &lt;
+        </button>
+        <button
+          onClick={handleNext}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            fontSize: '36px',
+            color: '#8B6F47',
+            cursor: 'pointer',
+            padding: '10px',
+            transition: 'opacity 0.3s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        >
+          &gt;
+        </button>
+      </div>
+
+      {/* Description Text */}
+      <div style={{
+        position: 'absolute',
+        bottom: '250px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        maxWidth: '700px',
+        textAlign: 'left',
+        zIndex: 100
+      }}>
         <p style={{
-          fontSize: '18px',
+          fontSize: '20px',
           lineHeight: '1.6',
-          color: '#666'
+          fontWeight: 600,
+          color: '#8B6F47'
         }}>
           {drinkDescriptions[drinkId]}
         </p>
       </div>
       
       <Canvas
-        style={{ width: '100vw', height: '100vh', position: 'relative', zIndex: 1 }}
+        style={{ 
+          width: '400px', 
+          height: '400px', 
+          position: 'absolute',
+          top: '45%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 20
+        }}
         camera={{ position: [3, 2, 5], fov: 50 }}
       >
         <Suspense fallback={<Loader />}>
@@ -261,97 +346,21 @@ export default function DrinkDetail() {
           <DrinkModel modelPath={drinks[drinkId]} />
           
           <OrbitControls 
-            enableZoom={true}
-            minDistance={2}
-            maxDistance={10}
+            enableZoom={false}
             enablePan={false}
+            enableRotate={true}
           />
         </Suspense>
       </Canvas>
       
-      <button
-        onClick={handlePrevious}
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '40px',
-          transform: 'translateY(-50%)',
-          width: '60px',
-          height: '60px',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          color: 'white',
-          border: '2px solid rgba(255, 255, 255, 0.3)',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          fontSize: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.3s ease',
-          zIndex: 100,
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-        }}
-        aria-label="Previous drink"
-      >
-        ‹
-      </button>
-      
-      <button
-        onClick={handleNext}
-        style={{
-          position: 'absolute',
-          top: '50%',
-          right: '40px',
-          transform: 'translateY(-50%)',
-          width: '60px',
-          height: '60px',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          color: 'white',
-          border: '2px solid rgba(255, 255, 255, 0.3)',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          fontSize: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.3s ease',
-          zIndex: 100,
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-        }}
-        aria-label="Next drink"
-      >
-        ›
-      </button>
-      
+      {/* Carousel Dots */}
       <div style={{
         position: 'absolute',
-        bottom: '30px',
+        bottom: '180px',
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
-        gap: '10px',
+        gap: '8px',
         zIndex: 100
       }}>
         {drinks.map((_, index) => (
@@ -359,18 +368,88 @@ export default function DrinkDetail() {
             key={index}
             onClick={() => navigate(`/drink/${index}`)}
             style={{
-              width: '10px',
-              height: '10px',
+              width: '8px',
+              height: '8px',
               borderRadius: '50%',
               border: 'none',
-              backgroundColor: index === drinkId ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.3)',
+              backgroundColor: index === drinkId ? '#8B6F47' : '#D4C4B0',
               cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              padding: 0
             }}
             aria-label={`Go to ${drinkNames[index]}`}
           />
         ))}
       </div>
+
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          position: 'absolute',
+          bottom: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '12px 40px',
+          backgroundColor: 'white',
+          color: 'black',
+          border: 'none',
+          borderRadius: '30px',
+          fontSize: '18px',
+          fontWeight: '500',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+          zIndex: 100
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#f0f0f0';
+          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'white';
+          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+        }}
+      >
+        Back
+      </button>
+      
+      {/* Scrolling Banner */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '60px',
+        backgroundColor: '#8B6F47',
+        display: 'flex',
+        alignItems: 'center',
+        overflow: 'hidden',
+        zIndex: 100
+      }}>
+        <div style={{
+          display: 'flex',
+          animation: 'scroll 20s linear infinite',
+          whiteSpace: 'nowrap',
+          color: 'white',
+          fontSize: '18px',
+          fontWeight: '500'
+        }}>
+          {Array(10).fill(null).map((_, i) => (
+            <span key={i} style={{ marginRight: '40px' }}>
+              Science says it works. Why not try it now? ✦
+            </span>
+          ))}
+        </div>
+      </div>
+      <style>
+        {`
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}
+      </style>
     </div>
   );
 }

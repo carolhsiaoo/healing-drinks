@@ -222,25 +222,26 @@ export default function App() {
           padding: '15px 30px',
           fontSize: '18px',
           fontWeight: 'bold',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          border: '2px solid white',
+          backgroundColor: 'white',
+          color: 'black',
+          border: 'none',
           borderRadius: '30px',
           cursor: 'pointer',
           zIndex: 20,
           transition: 'all 0.3s ease',
           textTransform: 'uppercase',
-          letterSpacing: '2px'
+          letterSpacing: '2px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'white';
-          e.currentTarget.style.color = 'black';
-          e.currentTarget.style.borderColor = 'black';
+          e.currentTarget.style.backgroundColor = '#f0f0f0';
+          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
+          e.currentTarget.style.transform = 'translate(-50%, -50%) translateY(-2px)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-          e.currentTarget.style.color = 'white';
-          e.currentTarget.style.borderColor = 'white';
+          e.currentTarget.style.backgroundColor = 'white';
+          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+          e.currentTarget.style.transform = 'translate(-50%, -50%)';
         }}
       >
         View {drinkNames[focusedDrinkIndex]}
