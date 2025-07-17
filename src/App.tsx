@@ -97,11 +97,11 @@ interface SceneProps {
     lookAtY: number;
     fov: number;
   };
+  focusedIndex: number;
   onFocusChange: (index: number) => void;
 }
 
-function Scene({ cameraControls, onFocusChange }: SceneProps) {
-  const [focusedIndex, setFocusedIndex] = useState(0);
+function Scene({ cameraControls, focusedIndex, onFocusChange }: SceneProps) {
   const drinks = [
     '/drink4.glb',
     '/drink2.glb',
@@ -161,7 +161,6 @@ function Scene({ cameraControls, onFocusChange }: SceneProps) {
             index={i}
             focusedIndex={focusedIndex}
             onClick={(idx: number) => {
-              setFocusedIndex(idx);
               onFocusChange(idx);
             }}
           />
@@ -175,11 +174,27 @@ export default function App() {
   const [focusedDrinkIndex, setFocusedDrinkIndex] = useState(0);
   const navigate = useNavigate();
   const drinkNames = [
-    'smoothie',
-    'latte', 
-    'milk',
-    'macchiato',
-    'lemonade'
+    'Smoothie',
+    'Latte', 
+    'Milk',
+    'Macchiato',
+    'Lemonade'
+  ];
+  
+  const drinkColors = [
+    'rgba(166, 75, 75, 0.3)',    // Smoothie
+    'rgba(139, 121, 72, 0.3)',    // Latte
+    'rgba(61, 61, 61, 0.5)',  // Milk
+    'rgba(139, 97, 72, 0.3)',    // Macchiato
+    'rgba(75, 113, 14, 0.4)'   // Lemonade
+  ];
+  
+  const drinkBannerTexts = [
+    'Move to Feel Better',
+    'Emotional Support',
+    'Learn to Heal',
+    'Scientific Healing',
+    'Motivation Boost'
   ];
   
   const cameraControls = useControls('Camera', {
@@ -187,9 +202,19 @@ export default function App() {
     positionY: { value: 2.2, min: 0, max: 10, step: 0.1 },
     positionZ: { value: 0, min: -10, max: 10, step: 0.1 },
     orbitMultiplier: { value: 3.0, min: 0.5, max: 3, step: 0.1 },
-    lookAtY: { value: 0.1, min: -2, max: 5, step: 0.1 },
-    fov: { value: 35, min: 10, max: 120, step: 1 },
+    lookAtY: { value: 0.3, min: -2, max: 5, step: 0.1 },
+    fov: { value: 40, min: 10, max: 120, step: 1 },
   });
+
+  const handlePrevDrink = () => {
+    const newIndex = (focusedDrinkIndex - 1 + drinkNames.length) % drinkNames.length;
+    setFocusedDrinkIndex(newIndex);
+  };
+
+  const handleNextDrink = () => {
+    const newIndex = (focusedDrinkIndex + 1) % drinkNames.length;
+    setFocusedDrinkIndex(newIndex);
+  };
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -200,6 +225,88 @@ export default function App() {
         lowlightColor="#e3f4fc"
         enableControls={true}
       />
+      
+      {/* Header with Logo and About */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '30px 50px',
+        zIndex: 20,
+      }}>
+        <div style={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: 'black',
+        }}>
+          Logo
+        </div>
+        <a 
+          href="/about"
+          style={{
+            fontSize: '18px',
+            color: 'black',
+            textDecoration: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          About
+        </a>
+      </div>
+
+      {/* Main Title */}
+      <div style={{
+        position: 'absolute',
+        top: '15%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        textAlign: 'center',
+        zIndex: 20,
+      }}>
+        <h1 style={{
+          fontSize: '36px',
+          fontWeight: 'bold',
+          color: 'black',
+          margin: 0,
+        }}>
+          Chose your healing drink
+        </h1>
+      </div>
+
+      {/* Scrolling Drink Name Behind 3D Models */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '0',
+        width: '100%',
+        height: '140px',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        zIndex: 5,
+        transform: 'translateY(-50%)',
+      }}>
+        <div 
+          key={focusedDrinkIndex}
+          style={{
+            display: 'flex',
+            whiteSpace: 'nowrap',
+            animation: 'scroll 50s linear infinite',
+            fontSize: '140px',
+            fontWeight: 'bold',
+            color: 'rgba(61, 61, 61, 0.5)',
+            textTransform: 'uppercase',
+            letterSpacing: '10px',
+          }}
+        >
+          {Array(20).fill(drinkNames[focusedDrinkIndex]).join(' • ')}
+        </div>
+      </div>
+
       <Canvas
         style={{ width: '100vw', height: '100vh', zIndex: 10, position: 'relative' }}
         camera={{ 
@@ -208,71 +315,123 @@ export default function App() {
         }}
       >
         <Suspense fallback={null}>
-          <Scene cameraControls={cameraControls} onFocusChange={setFocusedDrinkIndex} />
+          <Scene cameraControls={cameraControls} focusedIndex={focusedDrinkIndex} onFocusChange={setFocusedDrinkIndex} />
           <OrbitControls enableZoom={false} />
         </Suspense>
       </Canvas>
+
+      {/* Left Navigation Arrow */}
       <button
-        onClick={() => navigate(`/drink/${focusedDrinkIndex}`)}
+        onClick={handlePrevDrink}
         style={{
           position: 'absolute',
-          top: '80%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          padding: '15px 30px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          backgroundColor: 'white',
-          color: 'black',
+          top: '50%',
+          left: '10%',
+          transform: 'translateY(-50%)',
+          width: '50px',
+          height: '50px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
           border: 'none',
-          borderRadius: '30px',
           cursor: 'pointer',
-          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '24px',
           transition: 'all 0.3s ease',
-          textTransform: 'uppercase',
-          letterSpacing: '2px',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+          zIndex: 20,
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#f0f0f0';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
-          e.currentTarget.style.transform = 'translate(-50%, -50%) translateY(-2px)';
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+          e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'white';
-          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
-          e.currentTarget.style.transform = 'translate(-50%, -50%)';
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
         }}
       >
-        View {drinkNames[focusedDrinkIndex]}
+        &lt;
       </button>
+
+
+      {/* Right Navigation Arrow */}
+      <button
+        onClick={handleNextDrink}
+        style={{
+          position: 'absolute',
+          top: '50%',
+          right: '10%',
+          transform: 'translateY(-50%)',
+          width: '50px',
+          height: '50px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '24px',
+          transition: 'all 0.3s ease',
+          zIndex: 20,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+          e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+        }}
+      >
+        &gt;
+      </button>
+
+      {/* Scientific Healing Text and Choose Button */}
       <div style={{
         position: 'absolute',
-        top: '50%',
-        left: '0',
-        width: '100vw',
-        height: '60px',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        zIndex: 1,
-        pointerEvents: 'none'
+        bottom: '15%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        textAlign: 'center',
+        zIndex: 20,
       }}>
-        <div 
-          key={focusedDrinkIndex}
-          style={{
-          display: 'flex',
-          whiteSpace: 'nowrap',
-          animation: 'scroll 15s linear infinite',
-          color: 'black',
-          fontSize: '40px',
+        {/* <p style={{
+          fontSize: '20px',
+          color: drinkColors[focusedDrinkIndex].replace(/[\d.]+\)$/, '1)'),
           fontWeight: 'bold',
-          fontFamily: 'monospace',
-          textShadow: '2px 2px 4px rgba(255,255,255,0.8)'
+          marginBottom: '30px',
         }}>
-          {Array(20).fill(drinkNames[focusedDrinkIndex]).join(' • ')}
-        </div>
+          {drinkBannerTexts[focusedDrinkIndex]}
+        </p> */}
+        <button
+          onClick={() => navigate(`/drink/${focusedDrinkIndex}`)}
+          style={{
+            padding: '15px 40px',
+            fontSize: '18px',
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'none',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#f0f0f0';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          Choose
+        </button>
       </div>
+      
       <style>
         {`
           @keyframes scroll {
