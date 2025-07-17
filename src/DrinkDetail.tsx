@@ -89,7 +89,7 @@ function DrinkModel({ modelPath }: DrinkModelProps) {
   });
 
   return (
-    <group ref={group} scale={0.5} position={[0, -0.5, 0]}>
+    <group ref={group} scale={0.4} position={[0, -1, 0]}>
       <primitive object={scene} />
     </group>
   );
@@ -129,12 +129,36 @@ export default function DrinkDetail() {
     'lemonade'
   ];
 
+  const drinkCategories = [
+    'Move to Feel Better',
+    'Emotional Support',
+    'Learn to Heal',
+    'Scientific Healing',
+    'Motivation Boost'
+  ];
+
   const drinkDescriptions = [
-    'Feeling stressed? Try progressive muscle relaxation: Tense and release each muscle group, starting from your toes up to your head. This releases physical tension stored in your body.',
-    'Need a mental reset? Practice the 5-4-3-2-1 grounding technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste.',
-    'Feeling scattered? Try box breathing: Breathe in for 4 counts, hold for 4, exhale for 4, hold for 4. This technique helps regulate your autonomic nervous system.',
-    'Feeling a little overwhelmed? Try the 4-7-8 breathing technique: Breathe in for 4 seconds, hold for 7, exhale for 8. Just a few rounds can reset your nervous system.',
-    'Need instant calm? Try the physiological sigh: Take a double inhale through your nose (one deep, one sip), then a long exhale through your mouth. This maximizes oxygen exchange.'
+    'Stand up, reach your arms overhead, and take a deep breath. Hold for 5 seconds. Movement releases endorphins!',
+    '"Even the darkest night will end and the sun will rise." — Victor Hugo. Sometimes, hope is all we need to carry on.',
+    'Curious minds heal faster. Watch Brené Brown\'s TED Talk on vulnerability — it might just change how you see strength.',
+    'Try the 4-7-8 breathing technique: Breathe in for 4 seconds, hold for 7, exhale for 8. Do a few rounds to reset.',
+    'Start small today: Make your bed. Drink water. Send one kind text. These 3 simple actions can shift your entire day.'
+  ];
+
+  const drinkTitleColors = [
+    '#8B1D33', // smoothie - red
+    '#6B5D4F', // latte - olive/brownish
+    '#333333', // milk - dark gray
+    '#8B6F47', // macchiato - brown
+    '#0E750E'  // lemonade - green
+  ];
+
+  const drinkBannerTexts = [
+    'A small movement can make a big shift.',
+    'Sometimes, all we need is a gentle reminder.',
+    'Knowledge can comfort more than you think.',
+    'Science says it works. Why not try it now?',
+    'Action fuels momentum.'
   ];
 
   const drinkBackgroundColors = [
@@ -225,10 +249,10 @@ export default function DrinkDetail() {
       }}>
         <h3 style={{ 
           fontSize: '24px', 
-          color: '#8B6F47', 
+          color: drinkTitleColors[drinkId], 
           fontWeight: 'bold',
           margin: 0
-        }}>Scientific Healing</h3>
+        }}>{drinkCategories[drinkId]}</h3>
       </div>
 
       {/* Drink Title Pattern - Behind everything */}
@@ -249,10 +273,11 @@ export default function DrinkDetail() {
           <h1 key={index} style={{
             fontSize: '96px',
             fontWeight: 'bold',
-            color: '#8B6F47',
+            color: drinkTitleColors[drinkId],
             margin: '0 20px',
             textTransform: 'capitalize',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            opacity: 0.3
           }}>
             {drinkNames[drinkId]}
           </h1>
@@ -276,7 +301,7 @@ export default function DrinkDetail() {
             backgroundColor: 'transparent',
             border: 'none',
             fontSize: '36px',
-            color: '#8B6F47',
+            color: drinkTitleColors[drinkId],
             cursor: 'pointer',
             padding: '10px',
             transition: 'opacity 0.3s ease'
@@ -292,7 +317,7 @@ export default function DrinkDetail() {
             backgroundColor: 'transparent',
             border: 'none',
             fontSize: '36px',
-            color: '#8B6F47',
+            color: drinkTitleColors[drinkId],
             cursor: 'pointer',
             padding: '10px',
             transition: 'opacity 0.3s ease'
@@ -318,7 +343,7 @@ export default function DrinkDetail() {
           fontSize: '20px',
           lineHeight: '1.6',
           fontWeight: 600,
-          color: '#8B6F47'
+          color: drinkTitleColors[drinkId]
         }}>
           {drinkDescriptions[drinkId]}
         </p>
@@ -326,10 +351,10 @@ export default function DrinkDetail() {
       
       <Canvas
         style={{ 
-          width: '400px', 
-          height: '400px', 
+          width: '500px', 
+          height: '500px', 
           position: 'absolute',
-          top: '45%',
+          top: '40%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
           zIndex: 20
@@ -372,7 +397,7 @@ export default function DrinkDetail() {
               height: '8px',
               borderRadius: '50%',
               border: 'none',
-              backgroundColor: index === drinkId ? '#8B6F47' : '#D4C4B0',
+              backgroundColor: index === drinkId ? drinkTitleColors[drinkId] : '#D4C4B0',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
               padding: 0
@@ -419,9 +444,10 @@ export default function DrinkDetail() {
         position: 'absolute',
         bottom: 0,
         left: 0,
+        opacity: 0.55,
         width: '100%',
         height: '60px',
-        backgroundColor: '#8B6F47',
+        backgroundColor: drinkTitleColors[drinkId],
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
@@ -437,7 +463,7 @@ export default function DrinkDetail() {
         }}>
           {Array(10).fill(null).map((_, i) => (
             <span key={i} style={{ marginRight: '40px' }}>
-              Science says it works. Why not try it now? ✦
+              {drinkBannerTexts[drinkId]} ✦
             </span>
           ))}
         </div>
