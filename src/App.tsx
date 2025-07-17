@@ -270,7 +270,7 @@ export default function App() {
         <h1 style={{
           fontSize: '36px',
           fontWeight: 'bold',
-          color: 'black',
+          color: 'rgba(61, 61, 61, 1)',
           margin: 0,
         }}>
           Chose your healing drink
@@ -320,74 +320,8 @@ export default function App() {
         </Suspense>
       </Canvas>
 
-      {/* Left Navigation Arrow */}
-      <button
-        onClick={handlePrevDrink}
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '10%',
-          transform: 'translateY(-50%)',
-          width: '50px',
-          height: '50px',
-          borderRadius: '50%',
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '24px',
-          transition: 'all 0.3s ease',
-          zIndex: 20,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-        }}
-      >
-        &lt;
-      </button>
 
-
-      {/* Right Navigation Arrow */}
-      <button
-        onClick={handleNextDrink}
-        style={{
-          position: 'absolute',
-          top: '50%',
-          right: '10%',
-          transform: 'translateY(-50%)',
-          width: '50px',
-          height: '50px',
-          borderRadius: '50%',
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '24px',
-          transition: 'all 0.3s ease',
-          zIndex: 20,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-          e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-        }}
-      >
-        &gt;
-      </button>
-
-      {/* Scientific Healing Text and Choose Button */}
+      {/* Navigation and Choose Buttons */}
       <div style={{
         position: 'absolute',
         bottom: '15%',
@@ -396,40 +330,107 @@ export default function App() {
         textAlign: 'center',
         zIndex: 20,
       }}>
-        {/* <p style={{
+        {/* Banner Text */}
+        <p style={{
           fontSize: '20px',
-          color: drinkColors[focusedDrinkIndex].replace(/[\d.]+\)$/, '1)'),
+          color: 'rgba(61, 61, 61, 1)',
           fontWeight: 'bold',
           marginBottom: '30px',
         }}>
           {drinkBannerTexts[focusedDrinkIndex]}
-        </p> */}
-        <button
-          onClick={() => navigate(`/drink/${focusedDrinkIndex}`)}
-          style={{
-            padding: '15px 40px',
-            fontSize: '18px',
-            backgroundColor: 'white',
-            color: 'black',
-            border: 'none',
-            borderRadius: '30px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#f0f0f0';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'white';
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          Choose
-        </button>
+        </p>
+        
+        {/* Button Group */}
+        <div style={{
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          {/* Left Arrow */}
+          <button
+            onClick={handlePrevDrink}
+            style={{
+              padding: '15px 25px',
+              fontSize: '18px',
+              backgroundColor: 'white',
+              color: 'black',
+              border: 'none',
+              borderRadius: '30px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f0f0f0';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            &lt;
+          </button>
+
+          {/* Choose Button */}
+          <button
+            onClick={() => navigate(`/drink/${focusedDrinkIndex}`)}
+            style={{
+              padding: '15px 40px',
+              fontSize: '18px',
+              backgroundColor: 'white',
+              color: 'black',
+              border: 'none',
+              borderRadius: '30px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f0f0f0';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            Choose
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            onClick={handleNextDrink}
+            style={{
+              padding: '15px 25px',
+              fontSize: '18px',
+              backgroundColor: 'white',
+              color: 'black',
+              border: 'none',
+              borderRadius: '30px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f0f0f0';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            &gt;
+          </button>
+        </div>
       </div>
       
       <style>

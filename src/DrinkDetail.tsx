@@ -284,50 +284,6 @@ export default function DrinkDetail() {
         ))}
       </div>
 
-      {/* Navigation Buttons - Centered */}
-      <div style={{
-        position: 'absolute',
-        top: '45%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '600px',
-        zIndex: 15
-      }}>
-        <button
-          onClick={handlePrevious}
-          style={{
-            backgroundColor: 'transparent',
-            border: 'none',
-            fontSize: '36px',
-            color: drinkTitleColors[drinkId],
-            cursor: 'pointer',
-            padding: '10px',
-            transition: 'opacity 0.3s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-        >
-          &lt;
-        </button>
-        <button
-          onClick={handleNext}
-          style={{
-            backgroundColor: 'transparent',
-            border: 'none',
-            fontSize: '36px',
-            color: drinkTitleColors[drinkId],
-            cursor: 'pointer',
-            padding: '10px',
-            transition: 'opacity 0.3s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-        >
-          &gt;
-        </button>
-      </div>
 
       {/* Description Text */}
       <div style={{
@@ -407,37 +363,104 @@ export default function DrinkDetail() {
         ))}
       </div>
 
-      {/* Back Button */}
-      <button
-        onClick={() => navigate('/')}
-        style={{
-          position: 'absolute',
-          bottom: '100px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          padding: '12px 40px',
-          backgroundColor: 'white',
-          color: 'black',
-          border: 'none',
-          borderRadius: '30px',
-          fontSize: '18px',
-          fontWeight: '500',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-          zIndex: 100
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#f0f0f0';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'white';
-          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-        }}
-      >
-        Back
-      </button>
+      {/* Navigation Buttons */}
+      <div style={{
+        position: 'absolute',
+        bottom: '100px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        gap: '20px',
+        alignItems: 'center',
+        zIndex: 100
+      }}>
+        {/* Previous Drink */}
+        <button
+          onClick={() => navigate(`/drink/${(drinkId - 1 + drinkNames.length) % drinkNames.length}`)}
+          style={{
+            padding: '12px 25px',
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'none',
+            borderRadius: '30px',
+            fontSize: '18px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#f0f0f0';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          &lt;
+        </button>
+
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            padding: '12px 40px',
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'none',
+            borderRadius: '30px',
+            fontSize: '18px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#f0f0f0';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          Back
+        </button>
+
+        {/* Next Drink */}
+        <button
+          onClick={() => navigate(`/drink/${(drinkId + 1) % drinkNames.length}`)}
+          style={{
+            padding: '12px 25px',
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'none',
+            borderRadius: '30px',
+            fontSize: '18px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#f0f0f0';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          &gt;
+        </button>
+      </div>
       
       {/* Scrolling Banner */}
       <div style={{
