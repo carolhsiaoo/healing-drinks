@@ -485,8 +485,14 @@ export default function DrinkDetail() {
           fontWeight: '500'
         }}>
           {Array(10).fill(null).map((_, i) => (
-            <span key={i} style={{ marginRight: '40px' }}>
-              {drinkBannerTexts[drinkId]} ✦
+            <span key={i} style={{ 
+              marginRight: '60px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '40px'
+            }}>
+              <span>{drinkBannerTexts[drinkId]}</span>
+              <span>✦</span>
             </span>
           ))}
         </div>
