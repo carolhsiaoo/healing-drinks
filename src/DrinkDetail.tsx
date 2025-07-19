@@ -1,13 +1,17 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
 import { Suspense, useRef, useEffect } from 'react';
 import * as THREE from 'three';
+import { useControls } from 'leva';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
 
 interface DrinkModelProps {
   modelPath: string;
+  tiltStrength: number;
+  tiltSmoothness: number;
+  enableTilt: boolean;
 }
 
 function Loader() {
@@ -44,9 +48,11 @@ function Loader() {
   );
 }
 
-function DrinkModel({ modelPath }: DrinkModelProps) {
+function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: DrinkModelProps) {
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF(modelPath);
+  const { mouse } = useThree();
+  const targetRotation = useRef({ x: 0, y: 0 });
 
   // Material replacement logic - same as in App.tsx
   useEffect(() => {
@@ -81,11 +87,25 @@ function DrinkModel({ modelPath }: DrinkModelProps) {
     }
   }, [scene, modelPath]);
 
-  // Add rotation animation
+  // Add rotation animation with mouse tilt effect
   useFrame((state) => {
-    if (group.current) {
-      group.current.rotation.y = Math.sin(state.clock.elapsedTime) * 0.1;
+    if (!group.current) return;
+    
+    // Base rotation animation
+    const baseRotationY = Math.sin(state.clock.elapsedTime) * 0.1;
+    
+    // Mouse tilt effect
+    if (enableTilt) {
+      targetRotation.current.x = mouse.y * tiltStrength;
+      targetRotation.current.y = mouse.x * tiltStrength;
+    } else {
+      targetRotation.current.x = 0;
+      targetRotation.current.y = 0;
     }
+    
+    // Smooth interpolation
+    group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
+    group.current.rotation.y = baseRotationY + (enableTilt ? targetRotation.current.y : 0);
   });
 
   return (
@@ -113,6 +133,19 @@ export default function DrinkDetail() {
   const navigate = useNavigate();
   
   const drinkId = parseInt(id || '0', 10);
+  
+  const cameraControls = useControls('Detail Camera', {
+    positionX: { value: 3, min: -10, max: 10, step: 0.1 },
+    positionY: { value: 2, min: -5, max: 10, step: 0.1 },
+    positionZ: { value: 5, min: -10, max: 10, step: 0.1 },
+    fov: { value: 50, min: 20, max: 120, step: 1 },
+  });
+  
+  const tiltControls = useControls('Detail Tilt Effect', {
+    tiltStrength: { value: 0.3, min: 0, max: 1, step: 0.05 },
+    tiltSmoothness: { value: 0.1, min: 0.01, max: 0.3, step: 0.01 },
+    enableTilt: { value: true },
+  });
   const drinks = [
     '/drink4.glb',
     '/drink2.glb',
@@ -315,16 +348,28 @@ export default function DrinkDetail() {
           transform: 'translate(-50%, -50%)',
           zIndex: 20
         }}
-        camera={{ position: [3, 2, 5], fov: 50 }}
+        camera={{ 
+          position: [cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ], 
+          fov: cameraControls.fov 
+        }}
       >
         <Suspense fallback={<Loader />}>
-          <PerspectiveCamera makeDefault position={[3, 2, 5]} fov={50} />
+          <PerspectiveCamera 
+            makeDefault 
+            position={[cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ]} 
+            fov={cameraControls.fov} 
+          />
           <ambientLight intensity={1} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
           <pointLight position={[10, 10, 10]} intensity={0.5} />
           <Environment preset="city" background={false} />
           
-          <DrinkModel modelPath={drinks[drinkId]} />
+          <DrinkModel 
+            modelPath={drinks[drinkId]} 
+            tiltStrength={tiltControls.tiltStrength}
+            tiltSmoothness={tiltControls.tiltSmoothness}
+            enableTilt={tiltControls.enableTilt}
+          />
           
           <OrbitControls 
             enableZoom={false}

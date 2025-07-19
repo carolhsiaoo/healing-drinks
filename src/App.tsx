@@ -1,4 +1,4 @@
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, PerspectiveCamera, Environment } from '@react-three/drei';
 import { Suspense, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
@@ -13,11 +13,16 @@ interface DrinkProps {
   index: number;
   focusedIndex: number;
   onClick: (index: number) => void;
+  tiltStrength: number;
+  tiltSmoothness: number;
+  enableTilt: boolean;
 }
 
-function Drink({ modelPath, position, index, focusedIndex, onClick }: DrinkProps) {
+function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength, tiltSmoothness, enableTilt }: DrinkProps) {
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF(modelPath);
+  const { mouse } = useThree();
+  const targetRotation = useRef({ x: 0, y: 0 });
 
   // 材質替換邏輯：glass 與 chocolate
   useEffect(() => {
@@ -63,17 +68,35 @@ function Drink({ modelPath, position, index, focusedIndex, onClick }: DrinkProps
     }
   }, [scene, modelPath, index]);
 
-  // 浮動 + 縮放動畫 (removed shader uTime updates)
+  // 浮動 + 縮放動畫 + 滑鼠傾斜效果（僅限焦點飲品）
   useFrame((state) => {
     if (!group.current) return;
 
     const t = state.clock.getElapsedTime();
-    group.current.rotation.y = Math.sin(t + index) * 0.1;
+    const isFocused = focusedIndex === index;
+    
+    // 基礎旋轉動畫
+    const baseRotationY = Math.sin(t + index) * 0.1;
+    
+    // 滑鼠傾斜效果 - 僅在焦點時應用
+    if (isFocused && enableTilt) {
+      targetRotation.current.x = mouse.y * tiltStrength;
+      targetRotation.current.y = mouse.x * tiltStrength;
+    } else {
+      targetRotation.current.x = 0;
+      targetRotation.current.y = 0;
+    }
+    
+    // 平滑插值旋轉
+    group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
+    group.current.rotation.y = baseRotationY + (isFocused && enableTilt ? targetRotation.current.y : 0);
+    
+    // 浮動效果
     group.current.position.y = 0.2 + Math.sin(t * 2 + index) * 0.05;
-    const targetScale = focusedIndex === index ? 0.25 : 0.1;
+    
+    // 縮放效果
+    const targetScale = isFocused ? 0.25 : 0.1;
     group.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
-
-    // No need to update uTime for static chocolate shader
   });
 
   return (
@@ -97,11 +120,16 @@ interface SceneProps {
     lookAtY: number;
     fov: number;
   };
+  tiltControls: {
+    tiltStrength: number;
+    tiltSmoothness: number;
+    enableTilt: boolean;
+  };
   focusedIndex: number;
   onFocusChange: (index: number) => void;
 }
 
-function Scene({ cameraControls, focusedIndex, onFocusChange }: SceneProps) {
+function Scene({ cameraControls, tiltControls, focusedIndex, onFocusChange }: SceneProps) {
   const drinks = [
     '/drink4.glb',
     '/drink2.glb',
@@ -163,6 +191,9 @@ function Scene({ cameraControls, focusedIndex, onFocusChange }: SceneProps) {
             onClick={(idx: number) => {
               onFocusChange(idx);
             }}
+            tiltStrength={tiltControls.tiltStrength}
+            tiltSmoothness={tiltControls.tiltSmoothness}
+            enableTilt={tiltControls.enableTilt}
           />
         );
       })}
@@ -197,13 +228,19 @@ export default function App() {
     'Motivation Boost'
   ];
   
-  const cameraControls = useControls('Camera', {
+  const cameraControls = useControls('Main Camera', {
     positionX: { value: 0, min: -10, max: 10, step: 0.1 },
     positionY: { value: 2.2, min: 0, max: 10, step: 0.1 },
     positionZ: { value: 0, min: -10, max: 10, step: 0.1 },
     orbitMultiplier: { value: 3.0, min: 0.5, max: 3, step: 0.1 },
     lookAtY: { value: 0.3, min: -2, max: 5, step: 0.1 },
     fov: { value: 40, min: 10, max: 120, step: 1 },
+  });
+  
+  const tiltControls = useControls('Main Tilt Effect', {
+    tiltStrength: { value: 0.3, min: 0, max: 1, step: 0.05 },
+    tiltSmoothness: { value: 0.1, min: 0.01, max: 0.3, step: 0.01 },
+    enableTilt: { value: true },
   });
 
   const handlePrevDrink = () => {
@@ -315,7 +352,7 @@ export default function App() {
         }}
       >
         <Suspense fallback={null}>
-          <Scene cameraControls={cameraControls} focusedIndex={focusedDrinkIndex} onFocusChange={setFocusedDrinkIndex} />
+          <Scene cameraControls={cameraControls} tiltControls={tiltControls} focusedIndex={focusedDrinkIndex} onFocusChange={setFocusedDrinkIndex} />
           <OrbitControls enableZoom={false} />
         </Suspense>
       </Canvas>
