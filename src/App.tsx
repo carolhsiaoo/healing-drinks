@@ -23,6 +23,30 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
   const { scene } = useGLTF(modelPath);
   const { mouse } = useThree();
   const targetRotation = useRef({ x: 0, y: 0 });
+  const previousFocusedIndex = useRef(focusedIndex);
+  const [tiltEnabled, setTiltEnabled] = useState(true);
+  
+  // Reset tilt when focus changes with delay
+  useEffect(() => {
+    if (previousFocusedIndex.current !== focusedIndex) {
+      // Disable tilt immediately
+      setTiltEnabled(false);
+      targetRotation.current = { x: 0, y: 0 };
+      if (group.current) {
+        group.current.rotation.x = 0;
+      }
+      previousFocusedIndex.current = focusedIndex;
+      
+      // Re-enable tilt after delay if this drink is focused
+      if (focusedIndex === index) {
+        const timer = setTimeout(() => {
+          setTiltEnabled(true);
+        }, 800); // 800ms delay
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [focusedIndex, index]);
 
   // 材質替換邏輯：glass 與 chocolate
   useEffect(() => {
@@ -78,8 +102,8 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
     // 基礎旋轉動畫
     const baseRotationY = Math.sin(t + index) * 0.1;
     
-    // 滑鼠傾斜效果 - 僅在焦點時應用
-    if (isFocused && enableTilt) {
+    // 滑鼠傾斜效果 - 僅在焦點時應用，且有延遲
+    if (isFocused && enableTilt && tiltEnabled) {
       targetRotation.current.x = mouse.y * tiltStrength;
       targetRotation.current.y = mouse.x * tiltStrength;
     } else {
@@ -89,7 +113,7 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
     
     // 平滑插值旋轉
     group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
-    group.current.rotation.y = baseRotationY + (isFocused && enableTilt ? targetRotation.current.y : 0);
+    group.current.rotation.y = baseRotationY + (isFocused && enableTilt && tiltEnabled ? targetRotation.current.y : 0);
     
     // 浮動效果
     group.current.position.y = 0.2 + Math.sin(t * 2 + index) * 0.05;

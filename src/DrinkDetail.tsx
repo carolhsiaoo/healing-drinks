@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
-import { Suspense, useRef, useEffect } from 'react';
+import { Suspense, useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useControls } from 'leva';
 import VantaFog from './VantaFog';
@@ -53,6 +53,32 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
   const { scene } = useGLTF(modelPath);
   const { mouse } = useThree();
   const targetRotation = useRef({ x: 0, y: 0 });
+  const previousPath = useRef(modelPath);
+  const [tiltEnabled, setTiltEnabled] = useState(false);
+  
+  // Reset tilt when drink changes with delay
+  useEffect(() => {
+    if (previousPath.current !== modelPath) {
+      // Disable tilt immediately
+      setTiltEnabled(false);
+      targetRotation.current = { x: 0, y: 0 };
+      if (group.current) {
+        group.current.rotation.x = 0;
+        group.current.rotation.y = 0;
+      }
+      previousPath.current = modelPath;
+      
+      // Re-enable tilt after delay
+      const timer = setTimeout(() => {
+        setTiltEnabled(true);
+      }, 800); // 800ms delay
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Enable tilt on first load
+      setTiltEnabled(true);
+    }
+  }, [modelPath]);
 
   // Material replacement logic - same as in App.tsx
   useEffect(() => {
@@ -94,8 +120,8 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
     // Base rotation animation
     const baseRotationY = Math.sin(state.clock.elapsedTime) * 0.1;
     
-    // Mouse tilt effect
-    if (enableTilt) {
+    // Mouse tilt effect with delay
+    if (enableTilt && tiltEnabled) {
       targetRotation.current.x = mouse.y * tiltStrength;
       targetRotation.current.y = mouse.x * tiltStrength;
     } else {
@@ -105,7 +131,7 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
     
     // Smooth interpolation
     group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
-    group.current.rotation.y = baseRotationY + (enableTilt ? targetRotation.current.y : 0);
+    group.current.rotation.y = baseRotationY + (enableTilt && tiltEnabled ? targetRotation.current.y : 0);
   });
 
   return (
