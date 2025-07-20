@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
+import { PresentationControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
 import { Suspense, useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useControls } from 'leva';
@@ -48,6 +48,81 @@ function Loader() {
   );
 }
 
+function AutoResetPresentationControls({ children, drinkId, autoResetDelay, enableAutoReset }: { 
+  children: React.ReactNode; 
+  drinkId: number; 
+  autoResetDelay: number; 
+  enableAutoReset: boolean; 
+}) {
+  const controlsRef = useRef<any>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastInteractionRef = useRef(Date.now());
+
+  // Reset when drink changes
+  useEffect(() => {
+    if (controlsRef.current && controlsRef.current.reset) {
+      controlsRef.current.reset();
+    }
+  }, [drinkId]);
+
+  // Auto-reset after inactivity
+  useEffect(() => {
+    if (!enableAutoReset) return;
+
+    const handleInteraction = () => {
+      lastInteractionRef.current = Date.now();
+      
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      timeoutRef.current = setTimeout(() => {
+        if (controlsRef.current && controlsRef.current.reset) {
+          controlsRef.current.reset();
+        }
+      }, autoResetDelay);
+    };
+
+    // Set up initial timeout
+    handleInteraction();
+
+    // Listen for mouse events on canvas
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      canvas.addEventListener('mousedown', handleInteraction);
+      canvas.addEventListener('touchstart', handleInteraction);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (canvas) {
+        canvas.removeEventListener('mousedown', handleInteraction);
+        canvas.removeEventListener('touchstart', handleInteraction);
+      }
+    };
+  }, [autoResetDelay, enableAutoReset]);
+
+  return (
+    <PresentationControls
+      ref={controlsRef}
+      enabled={true}
+      global={false}
+      cursor={true}
+      snap={true}
+      speed={1}
+      zoom={1}
+      rotation={[0, 0, 0]}
+      polar={[-Math.PI / 3, Math.PI / 3]}
+      azimuth={[-Math.PI / 1.4, Math.PI / 1.4]}
+      config={{ mass: 1, tension: 170, friction: 26 }}
+    >
+      {children}
+    </PresentationControls>
+  );
+}
+
 function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: DrinkModelProps) {
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF(modelPath);
@@ -58,6 +133,9 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
   const isFirstLoad = useRef(true);
   const baseMousePosition = useRef({ x: 0, y: 0 });
   
+  // Base tilt constant
+  const baseTiltX = 0.5;
+  
   // Reset tilt when drink changes with delay
   useEffect(() => {
     if (previousPath.current !== modelPath || isFirstLoad.current) {
@@ -66,8 +144,9 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
       setTiltEnabled(false);
       targetRotation.current = { x: 0, y: 0 };
       if (group.current) {
-        console.log(`[Detail] Resetting rotation to 0`);
-        group.current.rotation.x = 0;
+        console.log(`[Detail] Resetting rotation to base tilt`);
+        // Set directly to base tilt to avoid animation jump
+        group.current.rotation.x = baseTiltX;
         group.current.rotation.y = 0;
       }
       previousPath.current = modelPath;
@@ -151,12 +230,14 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
       targetRotation.current.y = 0;
     }
     
+    // Use the base tilt constant
+    
     // Smooth interpolation
     if (enableTilt && tiltEnabled) {
-      group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
+      group.current.rotation.x += (baseTiltX + targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
       group.current.rotation.y += (baseRotationY + targetRotation.current.y - group.current.rotation.y) * tiltSmoothness;
     } else {
-      group.current.rotation.x += (0 - group.current.rotation.x) * tiltSmoothness;
+      group.current.rotation.x += (baseTiltX - group.current.rotation.x) * tiltSmoothness;
       group.current.rotation.y += (baseRotationY - group.current.rotation.y) * tiltSmoothness;
     }
     
@@ -168,9 +249,9 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
   });
 
   return (
-    <group ref={group} scale={0.4} position={[0, -1, 0]}>
-      {/* Offset the model down so rotation happens around the base */}
-      <group position={[0, -0.3, 0]}>
+    <group ref={group} scale={0.2} position={[0, 0, 0]}>
+      {/* Center the model in the canvas */}
+      <group position={[0, -1, 0]}>
         <primitive object={scene} />
       </group>
     </group>
@@ -197,9 +278,9 @@ export default function DrinkDetail() {
   const drinkId = parseInt(id || '0', 10);
   
   const cameraControls = useControls('Detail Camera', {
-    positionX: { value: 3, min: -10, max: 10, step: 0.1 },
-    positionY: { value: 2, min: -5, max: 10, step: 0.1 },
-    positionZ: { value: 5, min: -10, max: 10, step: 0.1 },
+    positionX: { value: 0, min: -10, max: 10, step: 0.1 },
+    positionY: { value: 0, min: -5, max: 10, step: 0.1 },
+    positionZ: { value: 3, min: -10, max: 10, step: 0.1 },
     fov: { value: 50, min: 20, max: 120, step: 1 },
   });
   
@@ -207,6 +288,11 @@ export default function DrinkDetail() {
     tiltStrength: { value: 0.3, min: 0, max: 1, step: 0.05 },
     tiltSmoothness: { value: 0.1, min: 0.01, max: 0.3, step: 0.01 },
     enableTilt: { value: true },
+  });
+  
+  const presentationControls = useControls('Presentation Controls', {
+    autoResetDelay: { value: 3000, min: 1000, max: 10000, step: 500 },
+    enableAutoReset: { value: true },
   });
   const drinks = [
     '/drink4.glb',
@@ -426,18 +512,18 @@ export default function DrinkDetail() {
           <pointLight position={[10, 10, 10]} intensity={0.5} />
           <Environment preset="city" background={false} />
           
-          <DrinkModel 
-            modelPath={drinks[drinkId]} 
-            tiltStrength={tiltControls.tiltStrength}
-            tiltSmoothness={tiltControls.tiltSmoothness}
-            enableTilt={tiltControls.enableTilt}
-          />
-          
-          <OrbitControls 
-            enableZoom={false}
-            enablePan={false}
-            enableRotate={true}
-          />
+          <AutoResetPresentationControls
+            drinkId={drinkId}
+            autoResetDelay={presentationControls.autoResetDelay}
+            enableAutoReset={presentationControls.enableAutoReset}
+          >
+            <DrinkModel 
+              modelPath={drinks[drinkId]} 
+              tiltStrength={tiltControls.tiltStrength}
+              tiltSmoothness={tiltControls.tiltSmoothness}
+              enableTilt={tiltControls.enableTilt}
+            />
+          </AutoResetPresentationControls>
         </Suspense>
       </Canvas>
       
