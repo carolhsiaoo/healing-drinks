@@ -116,8 +116,17 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
       // Use mouse position relative to baseline position when tilt was enabled
       const relativeMouseX = mouse.x - baseMousePosition.current.x;
       const relativeMouseY = mouse.y - baseMousePosition.current.y;
-      targetRotation.current.x = relativeMouseY * tiltStrength;
-      targetRotation.current.y = relativeMouseX * tiltStrength;
+      
+      // Apply damping to make movement feel more stable
+      const dampingFactor = 0.5;
+      targetRotation.current.x = relativeMouseY * tiltStrength * dampingFactor;
+      targetRotation.current.y = relativeMouseX * tiltStrength * dampingFactor;
+      
+      // Clamp rotation to prevent excessive tilting
+      const maxTilt = 0.15; // Maximum tilt in radians (~8.5 degrees)
+      targetRotation.current.x = Math.max(-maxTilt, Math.min(maxTilt, targetRotation.current.x));
+      targetRotation.current.y = Math.max(-maxTilt, Math.min(maxTilt, targetRotation.current.y));
+      
       if (Math.abs(targetRotation.current.x) > 0.01 || Math.abs(targetRotation.current.y) > 0.01) {
         console.log(`[Drink ${index}] Mouse tilt: x=${targetRotation.current.x.toFixed(3)}, y=${targetRotation.current.y.toFixed(3)} (relative: ${relativeMouseX.toFixed(3)}, ${relativeMouseY.toFixed(3)})`);
       }
@@ -155,7 +164,10 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
       onClick={() => onClick(index)}
       scale={0.05}
     >
-      <primitive object={scene} />
+      {/* Offset the model down so rotation happens around the base */}
+      <group position={[0, -0.3, 0]}>
+        <primitive object={scene} />
+      </group>
     </group>
   );
 }
@@ -287,7 +299,7 @@ export default function App() {
   });
   
   const tiltControls = useControls('Main Tilt Effect', {
-    tiltStrength: { value: 0.3, min: 0, max: 1, step: 0.05 },
+    tiltStrength: { value: 1, min: 0, max: 1, step: 0.05 },
     tiltSmoothness: { value: 0.1, min: 0.01, max: 0.3, step: 0.01 },
     enableTilt: { value: true },
   });

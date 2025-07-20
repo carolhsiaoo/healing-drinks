@@ -132,8 +132,17 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
       // Use mouse position relative to baseline position when tilt was enabled
       const relativeMouseX = mouse.x - baseMousePosition.current.x;
       const relativeMouseY = mouse.y - baseMousePosition.current.y;
-      targetRotation.current.x = relativeMouseY * tiltStrength;
-      targetRotation.current.y = relativeMouseX * tiltStrength;
+      
+      // Apply damping to make movement feel more stable
+      const dampingFactor = 0.5;
+      targetRotation.current.x = relativeMouseY * tiltStrength * dampingFactor;
+      targetRotation.current.y = relativeMouseX * tiltStrength * dampingFactor;
+      
+      // Clamp rotation to prevent excessive tilting
+      const maxTilt = 0.15; // Maximum tilt in radians (~8.5 degrees)
+      targetRotation.current.x = Math.max(-maxTilt, Math.min(maxTilt, targetRotation.current.x));
+      targetRotation.current.y = Math.max(-maxTilt, Math.min(maxTilt, targetRotation.current.y));
+      
       if (Math.abs(targetRotation.current.x) > 0.01 || Math.abs(targetRotation.current.y) > 0.01) {
         console.log(`[Detail] Mouse tilt: x=${targetRotation.current.x.toFixed(3)}, y=${targetRotation.current.y.toFixed(3)} (relative: ${relativeMouseX.toFixed(3)}, ${relativeMouseY.toFixed(3)})`);
       }
@@ -160,7 +169,10 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
 
   return (
     <group ref={group} scale={0.4} position={[0, -1, 0]}>
-      <primitive object={scene} />
+      {/* Offset the model down so rotation happens around the base */}
+      <group position={[0, -0.3, 0]}>
+        <primitive object={scene} />
+      </group>
     </group>
   );
 }
