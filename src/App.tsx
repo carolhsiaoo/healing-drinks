@@ -25,21 +25,30 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
   const targetRotation = useRef({ x: 0, y: 0 });
   const previousFocusedIndex = useRef(focusedIndex);
   const [tiltEnabled, setTiltEnabled] = useState(true);
+  const baseMousePosition = useRef({ x: 0, y: 0 });
   
   // Reset tilt when focus changes with delay
   useEffect(() => {
     if (previousFocusedIndex.current !== focusedIndex) {
+      console.log(`[Drink ${index}] Focus changed from ${previousFocusedIndex.current} to ${focusedIndex}`);
       // Disable tilt immediately
       setTiltEnabled(false);
       targetRotation.current = { x: 0, y: 0 };
       if (group.current) {
+        console.log(`[Drink ${index}] Resetting rotation to 0`);
         group.current.rotation.x = 0;
+        group.current.rotation.y = 0;
       }
       previousFocusedIndex.current = focusedIndex;
       
       // Re-enable tilt after delay if this drink is focused
       if (focusedIndex === index) {
+        console.log(`[Drink ${index}] Will enable tilt after 800ms`);
         const timer = setTimeout(() => {
+          console.log(`[Drink ${index}] Enabling tilt`);
+          // Store current mouse position as baseline when enabling tilt
+          baseMousePosition.current = { x: mouse.x, y: mouse.y };
+          console.log(`[Drink ${index}] Baseline mouse position: x=${baseMousePosition.current.x.toFixed(3)}, y=${baseMousePosition.current.y.toFixed(3)}`);
           setTiltEnabled(true);
         }, 800); // 800ms delay
         
@@ -104,16 +113,32 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
     
     // 滑鼠傾斜效果 - 僅在焦點時應用，且有延遲
     if (isFocused && enableTilt && tiltEnabled) {
-      targetRotation.current.x = mouse.y * tiltStrength;
-      targetRotation.current.y = mouse.x * tiltStrength;
+      // Use mouse position relative to baseline position when tilt was enabled
+      const relativeMouseX = mouse.x - baseMousePosition.current.x;
+      const relativeMouseY = mouse.y - baseMousePosition.current.y;
+      targetRotation.current.x = relativeMouseY * tiltStrength;
+      targetRotation.current.y = relativeMouseX * tiltStrength;
+      if (Math.abs(targetRotation.current.x) > 0.01 || Math.abs(targetRotation.current.y) > 0.01) {
+        console.log(`[Drink ${index}] Mouse tilt: x=${targetRotation.current.x.toFixed(3)}, y=${targetRotation.current.y.toFixed(3)} (relative: ${relativeMouseX.toFixed(3)}, ${relativeMouseY.toFixed(3)})`);
+      }
     } else {
       targetRotation.current.x = 0;
       targetRotation.current.y = 0;
     }
     
     // 平滑插值旋轉
-    group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
-    group.current.rotation.y = baseRotationY + (isFocused && enableTilt && tiltEnabled ? targetRotation.current.y : 0);
+    if (isFocused && enableTilt && tiltEnabled) {
+      group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
+      group.current.rotation.y += (baseRotationY + targetRotation.current.y - group.current.rotation.y) * tiltSmoothness;
+    } else {
+      group.current.rotation.x += (0 - group.current.rotation.x) * tiltSmoothness;
+      group.current.rotation.y += (baseRotationY - group.current.rotation.y) * tiltSmoothness;
+    }
+    
+    // Debug logging every 60 frames (roughly once per second)
+    if (Math.floor(t * 60) % 60 === 0 && Math.floor(t * 60) !== Math.floor((t - 1/60) * 60)) {
+      console.log(`[Drink ${index}] State: focused=${isFocused}, tiltEnabled=${tiltEnabled}, enableTilt=${enableTilt}, rotation=(${group.current.rotation.x.toFixed(3)}, ${group.current.rotation.y.toFixed(3)})`);
+    }
     
     // 浮動效果
     group.current.position.y = 0.2 + Math.sin(t * 2 + index) * 0.05;

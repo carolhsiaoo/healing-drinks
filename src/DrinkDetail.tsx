@@ -55,28 +55,35 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
   const targetRotation = useRef({ x: 0, y: 0 });
   const previousPath = useRef(modelPath);
   const [tiltEnabled, setTiltEnabled] = useState(false);
+  const isFirstLoad = useRef(true);
+  const baseMousePosition = useRef({ x: 0, y: 0 });
   
   // Reset tilt when drink changes with delay
   useEffect(() => {
-    if (previousPath.current !== modelPath) {
+    if (previousPath.current !== modelPath || isFirstLoad.current) {
+      console.log(`[Detail] Model changed to: ${modelPath}`);
       // Disable tilt immediately
       setTiltEnabled(false);
       targetRotation.current = { x: 0, y: 0 };
       if (group.current) {
+        console.log(`[Detail] Resetting rotation to 0`);
         group.current.rotation.x = 0;
         group.current.rotation.y = 0;
       }
       previousPath.current = modelPath;
+      isFirstLoad.current = false;
       
       // Re-enable tilt after delay
+      console.log(`[Detail] Will enable tilt after 800ms`);
       const timer = setTimeout(() => {
+        console.log(`[Detail] Enabling tilt`);
+        // Store current mouse position as baseline when enabling tilt
+        baseMousePosition.current = { x: mouse.x, y: mouse.y };
+        console.log(`[Detail] Baseline mouse position: x=${baseMousePosition.current.x.toFixed(3)}, y=${baseMousePosition.current.y.toFixed(3)}`);
         setTiltEnabled(true);
       }, 800); // 800ms delay
       
       return () => clearTimeout(timer);
-    } else {
-      // Enable tilt on first load
-      setTiltEnabled(true);
     }
   }, [modelPath]);
 
@@ -122,16 +129,33 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
     
     // Mouse tilt effect with delay
     if (enableTilt && tiltEnabled) {
-      targetRotation.current.x = mouse.y * tiltStrength;
-      targetRotation.current.y = mouse.x * tiltStrength;
+      // Use mouse position relative to baseline position when tilt was enabled
+      const relativeMouseX = mouse.x - baseMousePosition.current.x;
+      const relativeMouseY = mouse.y - baseMousePosition.current.y;
+      targetRotation.current.x = relativeMouseY * tiltStrength;
+      targetRotation.current.y = relativeMouseX * tiltStrength;
+      if (Math.abs(targetRotation.current.x) > 0.01 || Math.abs(targetRotation.current.y) > 0.01) {
+        console.log(`[Detail] Mouse tilt: x=${targetRotation.current.x.toFixed(3)}, y=${targetRotation.current.y.toFixed(3)} (relative: ${relativeMouseX.toFixed(3)}, ${relativeMouseY.toFixed(3)})`);
+      }
     } else {
       targetRotation.current.x = 0;
       targetRotation.current.y = 0;
     }
     
     // Smooth interpolation
-    group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
-    group.current.rotation.y = baseRotationY + (enableTilt && tiltEnabled ? targetRotation.current.y : 0);
+    if (enableTilt && tiltEnabled) {
+      group.current.rotation.x += (targetRotation.current.x - group.current.rotation.x) * tiltSmoothness;
+      group.current.rotation.y += (baseRotationY + targetRotation.current.y - group.current.rotation.y) * tiltSmoothness;
+    } else {
+      group.current.rotation.x += (0 - group.current.rotation.x) * tiltSmoothness;
+      group.current.rotation.y += (baseRotationY - group.current.rotation.y) * tiltSmoothness;
+    }
+    
+    // Debug logging every 60 frames (roughly once per second)
+    const t = state.clock.elapsedTime;
+    if (Math.floor(t * 60) % 60 === 0 && Math.floor(t * 60) !== Math.floor((t - 1/60) * 60)) {
+      console.log(`[Detail] State: tiltEnabled=${tiltEnabled}, enableTilt=${enableTilt}, rotation=(${group.current.rotation.x.toFixed(3)}, ${group.current.rotation.y.toFixed(3)})`);
+    }
   });
 
   return (
