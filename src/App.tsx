@@ -6,6 +6,7 @@ import { useControls } from 'leva';
 import { useNavigate } from 'react-router-dom';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
+import Header from './components/Header';
 
 interface DrinkProps {
   modelPath: string;
@@ -325,36 +326,7 @@ export default function App() {
       />
       
       {/* Header with Logo and About */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '30px 50px',
-        zIndex: 20,
-      }}>
-        <div style={{
-          fontSize: '24px',
-          fontWeight: 'bold',
-          color: 'black',
-        }}>
-          Logo
-        </div>
-        <a 
-          href="/about"
-          style={{
-            fontSize: '18px',
-            color: 'black',
-            textDecoration: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          About
-        </a>
-      </div>
+      <Header />
 
       {/* Main Title */}
       <div style={{

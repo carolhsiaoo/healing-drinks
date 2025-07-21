@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { useControls } from 'leva';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
+import Header from './components/Header';
 
 interface DrinkModelProps {
   modelPath: string;
@@ -401,23 +402,7 @@ export default function DrinkDetail() {
         enableControls={true}
       />
       {/* Header */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '30px 50px',
-        zIndex: 100
-      }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1a1a1a', margin: 0 }}>Logo</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <span style={{ fontSize: '18px', color: '#1a1a1a' }}>About</span>
-          <span style={{ fontSize: '24px' }}>♪</span>
-        </div>
-      </div>
+      <Header showMusicIcon={true} />
 
       {/* Scientific Healing subtitle */}
       <div style={{
