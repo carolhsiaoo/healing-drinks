@@ -546,7 +546,7 @@ export default function DrinkDetail() {
               height: '8px',
               borderRadius: '50%',
               border: 'none',
-              backgroundColor: index === drinkId ? drinkTitleColors[drinkId] : '#D4C4B0',
+              backgroundColor: index === drinkId ? drinkTitleColors[drinkId] : '#ffffff',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
               padding: 0
