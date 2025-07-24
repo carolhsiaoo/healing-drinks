@@ -4,6 +4,7 @@ class AudioService {
   private clickSound: HTMLAudioElement | null = null;
   private isInitialized = false;
   private isMuted = false;
+  private backgroundVolume = 0.3;
 
   private constructor() {}
 
@@ -16,6 +17,9 @@ class AudioService {
 
   initialize(backgroundMusicSrc: string, clickSoundSrc: string, backgroundVolume = 0.3, clickVolume = 0.5) {
     if (this.isInitialized) return;
+
+    // Store background volume for fade effects
+    this.backgroundVolume = backgroundVolume;
 
     // Initialize background music
     this.backgroundMusic = new Audio(backgroundMusicSrc);
@@ -100,14 +104,52 @@ class AudioService {
     });
   }
 
-  toggleMute() {
+  async toggleMute() {
     this.isMuted = !this.isMuted;
     
     if (this.backgroundMusic) {
-      this.backgroundMusic.muted = this.isMuted;
+      if (this.isMuted) {
+        // Fade out when muting
+        await this.fadeOut(300); // 300ms fade out
+        this.backgroundMusic.muted = true;
+      } else {
+        // Fade in when unmuting
+        this.backgroundMusic.muted = false;
+        await this.fadeIn(300); // 300ms fade in
+      }
     }
     
     return this.isMuted;
+  }
+
+  private async fadeIn(duration: number = 300) {
+    if (!this.backgroundMusic || this.backgroundMusic.paused) return;
+    
+    const targetVolume = this.backgroundVolume;
+    const fadeSteps = 20;
+    const stepDuration = duration / fadeSteps;
+    const volumeIncrement = targetVolume / fadeSteps;
+    
+    this.backgroundMusic.volume = 0;
+    
+    for (let i = 0; i < fadeSteps; i++) {
+      this.backgroundMusic.volume = Math.min(targetVolume, volumeIncrement * (i + 1));
+      await new Promise(resolve => setTimeout(resolve, stepDuration));
+    }
+  }
+
+  private async fadeOut(duration: number = 300) {
+    if (!this.backgroundMusic || this.backgroundMusic.paused) return;
+    
+    const startVolume = this.backgroundMusic.volume;
+    const fadeSteps = 20;
+    const stepDuration = duration / fadeSteps;
+    const volumeDecrement = startVolume / fadeSteps;
+    
+    for (let i = 0; i < fadeSteps; i++) {
+      this.backgroundMusic.volume = Math.max(0, startVolume - (volumeDecrement * (i + 1)));
+      await new Promise(resolve => setTimeout(resolve, stepDuration));
+    }
   }
 
   getMuteState() {
@@ -115,7 +157,8 @@ class AudioService {
   }
 
   setBackgroundVolume(volume: number) {
-    if (this.backgroundMusic) {
+    this.backgroundVolume = volume;
+    if (this.backgroundMusic && !this.isMuted) {
       this.backgroundMusic.volume = volume;
     }
   }

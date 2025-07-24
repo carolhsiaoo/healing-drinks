@@ -15,9 +15,9 @@ const Header: React.FC<HeaderProps> = ({ showMusicIcon = false }) => {
     setIsMuted(audioService.getMuteState());
   }, []);
 
-  const handleMusicToggle = () => {
+  const handleMusicToggle = async () => {
     window.playClickSound?.();
-    const newMuteState = audioService.toggleMute();
+    const newMuteState = await audioService.toggleMute();
     setIsMuted(newMuteState);
   };
 
