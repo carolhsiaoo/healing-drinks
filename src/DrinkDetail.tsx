@@ -7,6 +7,7 @@ import { useControls } from 'leva';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
 import Header from './components/Header';
+import { AudioManager } from './components/AudioManager';
 
 interface DrinkModelProps {
   modelPath: string;
@@ -55,15 +56,13 @@ function AutoResetPresentationControls({ children, drinkId, autoResetDelay, enab
   autoResetDelay: number; 
   enableAutoReset: boolean; 
 }) {
-  const controlsRef = useRef<any>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // const controlsRef = useRef<any>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastInteractionRef = useRef(Date.now());
 
   // Reset when drink changes
   useEffect(() => {
-    if (controlsRef.current && controlsRef.current.reset) {
-      controlsRef.current.reset();
-    }
+    // Auto-reset is handled by remounting the component when drinkId changes
   }, [drinkId]);
 
   // Auto-reset after inactivity
@@ -78,9 +77,7 @@ function AutoResetPresentationControls({ children, drinkId, autoResetDelay, enab
       }
       
       timeoutRef.current = setTimeout(() => {
-        if (controlsRef.current && controlsRef.current.reset) {
-          controlsRef.current.reset();
-        }
+        // Reset happens automatically when component remounts
       }, autoResetDelay);
     };
 
@@ -107,7 +104,6 @@ function AutoResetPresentationControls({ children, drinkId, autoResetDelay, enab
 
   return (
     <PresentationControls
-      ref={controlsRef}
       enabled={true}
       global={false}
       cursor={true}
@@ -117,7 +113,6 @@ function AutoResetPresentationControls({ children, drinkId, autoResetDelay, enab
       rotation={[0, 0, 0]}
       polar={[-Math.PI / 3, Math.PI / 3]}
       azimuth={[-Math.PI / 1.4, Math.PI / 1.4]}
-      config={{ mass: 1, tension: 170, friction: 26 }}
     >
       {children}
     </PresentationControls>
@@ -382,18 +377,16 @@ export default function DrinkDetail() {
     return <div>Drink not found</div>;
   }
 
-  const handlePrevious = () => {
-    const prevId = drinkId === 0 ? drinks.length - 1 : drinkId - 1;
-    navigate(`/drink/${prevId}`);
-  };
-
-  const handleNext = () => {
-    const nextId = drinkId === drinks.length - 1 ? 0 : drinkId + 1;
-    navigate(`/drink/${nextId}`);
-  };
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <AudioManager 
+        backgroundMusicSrc="/background-music.mp3"
+        clickSoundSrc="/click-sound.mp3"
+        backgroundVolume={0.3}
+        clickVolume={0.5}
+        endTimeSeconds={120} // End music after 2 minutes
+      />
       <VantaFog 
         baseColor={currentColors.baseColor}
         highlightColor={currentColors.highlightColor}
@@ -525,7 +518,10 @@ export default function DrinkDetail() {
         {drinks.map((_, index) => (
           <button
             key={index}
-            onClick={() => navigate(`/drink/${index}`)}
+            onClick={() => {
+              window.playClickSound?.();
+              navigate(`/drink/${index}`);
+            }}
             style={{
               width: '8px',
               height: '8px',
@@ -554,7 +550,10 @@ export default function DrinkDetail() {
       }}>
         {/* Previous Drink */}
         <button
-          onClick={() => navigate(`/drink/${(drinkId - 1 + drinkNames.length) % drinkNames.length}`)}
+          onClick={() => {
+            window.playClickSound?.();
+            navigate(`/drink/${(drinkId - 1 + drinkNames.length) % drinkNames.length}`);
+          }}
           style={{
             padding: '12px 25px',
             backgroundColor: 'white',
@@ -583,7 +582,10 @@ export default function DrinkDetail() {
 
         {/* Back Button */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => {
+            window.playClickSound?.();
+            navigate('/');
+          }}
           style={{
             padding: '12px 40px',
             backgroundColor: 'white',
@@ -612,7 +614,10 @@ export default function DrinkDetail() {
 
         {/* Next Drink */}
         <button
-          onClick={() => navigate(`/drink/${(drinkId + 1) % drinkNames.length}`)}
+          onClick={() => {
+            window.playClickSound?.();
+            navigate(`/drink/${(drinkId + 1) % drinkNames.length}`);
+          }}
           style={{
             padding: '12px 25px',
             backgroundColor: 'white',

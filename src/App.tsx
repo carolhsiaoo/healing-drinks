@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
 import Header from './components/Header';
+import { AudioManager } from './components/AudioManager';
 
 interface DrinkProps {
   modelPath: string;
@@ -252,6 +253,7 @@ function Scene({ cameraControls, tiltControls, focusedIndex, onFocusChange }: Sc
             focusedIndex={focusedIndex}
             onClick={(idx: number) => {
               onFocusChange(idx);
+              window.playClickSound?.();
             }}
             tiltStrength={tiltControls.tiltStrength}
             tiltSmoothness={tiltControls.tiltSmoothness}
@@ -274,13 +276,6 @@ export default function App() {
     'Lemonade'
   ];
   
-  const drinkColors = [
-    'rgba(166, 75, 75, 0.3)',    // Smoothie
-    'rgba(139, 121, 72, 0.3)',    // Latte
-    'rgba(61, 61, 61, 0.5)',  // Milk
-    'rgba(139, 97, 72, 0.3)',    // Macchiato
-    'rgba(75, 113, 14, 0.4)'   // Lemonade
-  ];
   
   const drinkBannerTexts = [
     'Move to Feel Better',
@@ -308,15 +303,24 @@ export default function App() {
   const handlePrevDrink = () => {
     const newIndex = (focusedDrinkIndex - 1 + drinkNames.length) % drinkNames.length;
     setFocusedDrinkIndex(newIndex);
+    (window as any).playClickSound?.();
   };
 
   const handleNextDrink = () => {
     const newIndex = (focusedDrinkIndex + 1) % drinkNames.length;
     setFocusedDrinkIndex(newIndex);
+    (window as any).playClickSound?.();
   };
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <AudioManager 
+        backgroundMusicSrc="/background-music.mp3"
+        clickSoundSrc="/click-sound.mp3"
+        backgroundVolume={0.3}
+        clickVolume={0.5}
+        endTimeSeconds={120} // End music after 2 minutes
+      />
       <VantaFog 
         baseColor="#fffbfa"
         highlightColor="#f2e8e6"
@@ -447,7 +451,10 @@ export default function App() {
 
           {/* Choose Button */}
           <button
-            onClick={() => navigate(`/drink/${focusedDrinkIndex}`)}
+            onClick={() => {
+              window.playClickSound?.();
+              navigate(`/drink/${focusedDrinkIndex}`);
+            }}
             style={{
               padding: '15px 40px',
               fontSize: '18px',
