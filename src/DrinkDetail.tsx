@@ -317,7 +317,7 @@ export default function DrinkDetail() {
   const drinkDescriptions = [
     'Stand up, reach your arms overhead, and take a deep breath. Hold for 5 seconds. Movement releases endorphins!',
     '"Even the darkest night will end and the sun will rise." — Victor Hugo. Sometimes, hope is all we need to carry on.',
-    'Curious minds heal faster. Watch Brené Brown\'s TED Talk on vulnerability — it might just change how you see strength.',
+    'Curious minds heal faster. Watch <a href="https://www.youtube.com/watch?v=iCvmsMzlF7o&t=1s" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; font-family: inherit; font-size: inherit; font-weight: inherit;">the power of vulnerability TED Talk</a> from Brene Brown. It might just change how you see strength.',
     'Try the 4-7-8 breathing technique: Breathe in for 4 seconds, hold for 7, exhale for 8. Do a few rounds to reset.',
     'Start small today: Make your bed. Drink water. Send one kind text. These 3 simple actions can shift your entire day.'
   ];
@@ -459,9 +459,9 @@ export default function DrinkDetail() {
           lineHeight: '1.6',
           fontWeight: 600,
           color: drinkTitleColors[drinkId]
-        }}>
-          {drinkDescriptions[drinkId]}
-        </p>
+        }}
+        dangerouslySetInnerHTML={{ __html: drinkDescriptions[drinkId] }}
+        />
       </div>
       
       <Canvas
