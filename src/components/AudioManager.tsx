@@ -17,7 +17,7 @@ export const AudioManager = ({
   endTimeSeconds
 }: AudioManagerProps) => {
   useEffect(() => {
-    // Initialize audio service only once
+    // Initialize audio service
     audioService.initialize(backgroundMusicSrc, clickSoundSrc, backgroundVolume, clickVolume);
 
     // Set end time if provided
@@ -28,8 +28,7 @@ export const AudioManager = ({
     // Start background music on first user interaction
     const handleFirstInteraction = () => {
       audioService.playBackgroundMusic();
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
+      // Don't remove listeners here to allow re-triggering if needed
     };
 
     document.addEventListener('click', handleFirstInteraction);
@@ -39,7 +38,7 @@ export const AudioManager = ({
       document.removeEventListener('click', handleFirstInteraction);
       document.removeEventListener('touchstart', handleFirstInteraction);
     };
-  }, [backgroundMusicSrc, clickSoundSrc, backgroundVolume, clickVolume, endTimeSeconds]);
+  }, []); // Remove dependencies to prevent re-initialization
 
   return null;
 };

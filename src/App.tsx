@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
 import Header from './components/Header';
-import { AudioManager } from './components/AudioManager';
 
 interface DrinkProps {
   modelPath: string;
@@ -314,13 +313,6 @@ export default function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <AudioManager 
-        backgroundMusicSrc="/background-music.mp3"
-        clickSoundSrc="/click-sound.mp3"
-        backgroundVolume={0.3}
-        clickVolume={0.5}
-        endTimeSeconds={120} // End music after 2 minutes
-      />
       <VantaFog 
         baseColor="#fffbfa"
         highlightColor="#f2e8e6"

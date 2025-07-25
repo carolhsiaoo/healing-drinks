@@ -5,8 +5,14 @@ class AudioService {
   private isInitialized = false;
   private isMuted = false;
   private backgroundVolume = 0.3;
+  private wasPlayingBeforePause = false;
 
-  private constructor() {}
+  private constructor() {
+    // Set up visibility change listener
+    this.setupVisibilityChangeListener();
+    // Set up beforeunload listener
+    this.setupBeforeUnloadListener();
+  }
 
   static getInstance(): AudioService {
     if (!AudioService.instance) {
@@ -16,7 +22,11 @@ class AudioService {
   }
 
   initialize(backgroundMusicSrc: string, clickSoundSrc: string, backgroundVolume = 0.3, clickVolume = 0.5) {
-    if (this.isInitialized) return;
+    // If already initialized, clean up existing audio elements
+    if (this.isInitialized) {
+      console.log('[AudioService] Already initialized, cleaning up existing audio');
+      this.cleanup();
+    }
 
     // Store background volume for fade effects
     this.backgroundVolume = backgroundVolume;
@@ -35,6 +45,7 @@ class AudioService {
     window.playClickSound = () => this.playClickSound();
 
     this.isInitialized = true;
+    console.log('[AudioService] Initialized with music:', backgroundMusicSrc);
   }
 
   async playBackgroundMusic() {
@@ -43,7 +54,9 @@ class AudioService {
     try {
       // Only play if not already playing
       if (this.backgroundMusic.paused) {
+        console.log('[AudioService] Attempting to play background music');
         await this.backgroundMusic.play();
+        console.log('[AudioService] Background music started successfully');
       }
     } catch (error) {
       console.error('Error playing background music:', error);
@@ -52,6 +65,7 @@ class AudioService {
 
   pauseBackgroundMusic() {
     if (this.backgroundMusic && !this.backgroundMusic.paused) {
+      console.log('[AudioService] Pausing background music');
       this.backgroundMusic.pause();
     }
   }
@@ -167,6 +181,84 @@ class AudioService {
     if (this.clickSound) {
       this.clickSound.volume = volume;
     }
+  }
+
+  private setupVisibilityChangeListener() {
+    // Handle visibility change
+    document.addEventListener('visibilitychange', () => {
+      console.log('[AudioService] Visibility changed:', document.hidden ? 'hidden' : 'visible');
+      if (document.hidden) {
+        // Page is hidden, pause music
+        if (this.backgroundMusic && !this.backgroundMusic.paused && !this.isMuted) {
+          console.log('[AudioService] Page hidden - storing play state and pausing');
+          this.wasPlayingBeforePause = true;
+          this.pauseBackgroundMusic();
+        }
+      } else {
+        // Page is visible again, resume music if it was playing before
+        if (this.wasPlayingBeforePause && !this.isMuted) {
+          console.log('[AudioService] Page visible - resuming music');
+          this.wasPlayingBeforePause = false;
+          this.playBackgroundMusic();
+        }
+      }
+    });
+
+    // Also handle focus events for better reliability
+    window.addEventListener('focus', () => {
+      console.log('[AudioService] Window gained focus');
+      // Page gained focus, resume music if it was playing before
+      if (this.wasPlayingBeforePause && !this.isMuted) {
+        console.log('[AudioService] Resuming music after focus gain');
+        this.wasPlayingBeforePause = false;
+        this.playBackgroundMusic();
+      }
+    });
+
+    window.addEventListener('blur', () => {
+      console.log('[AudioService] Window blur event');
+      // Only pause if the entire window loses focus (not just clicking inside the page)
+      // This helps differentiate between tab switches and clicking elements
+      setTimeout(() => {
+        if (!document.hasFocus() && this.backgroundMusic && !this.backgroundMusic.paused && !this.isMuted) {
+          console.log('[AudioService] Window lost focus - pausing music');
+          this.wasPlayingBeforePause = true;
+          this.pauseBackgroundMusic();
+        }
+      }, 100);
+    });
+  }
+
+  private setupBeforeUnloadListener() {
+    window.addEventListener('beforeunload', () => {
+      // Pause music when user navigates away
+      this.pauseBackgroundMusic();
+    });
+  }
+
+  // Method to handle external link clicks
+  handleExternalLinkClick() {
+    if (this.backgroundMusic && !this.backgroundMusic.paused && !this.isMuted) {
+      this.wasPlayingBeforePause = true;
+      this.pauseBackgroundMusic();
+    }
+  }
+
+  // Clean up audio resources
+  private cleanup() {
+    if (this.backgroundMusic) {
+      this.backgroundMusic.pause();
+      this.backgroundMusic.currentTime = 0;
+      this.backgroundMusic.src = '';
+      this.backgroundMusic = null;
+    }
+    if (this.clickSound) {
+      this.clickSound.pause();
+      this.clickSound.currentTime = 0;
+      this.clickSound.src = '';
+      this.clickSound = null;
+    }
+    this.wasPlayingBeforePause = false;
   }
 }
 
