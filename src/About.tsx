@@ -88,16 +88,20 @@ const About: React.FC = () => {
           
           <div style={{
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: '20px',
           }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              backgroundColor: '#E0E0E0',
-              flexShrink: 0,
-            }} />
+            <img 
+              src="/Avatar.png" 
+              alt="Carol's Avatar"
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                flexShrink: 0,
+              }} 
+            />
             
             <div style={{ flex: 1 }}>
               <p style={{
@@ -105,6 +109,7 @@ const About: React.FC = () => {
                 lineHeight: '1.8',
                 color: '#3d3d3d',
                 marginBottom: '20px',
+                margin: 0,
               }}>
                 I'm Carol, a creative developer navigating life between 
                 design and technology. If this project resonates with you, I'd 
@@ -114,6 +119,7 @@ const About: React.FC = () => {
               <div style={{
                 display: 'flex',
                 gap: '15px',
+                marginTop: '20px',
               }}>
                 <a href="#" style={{ display: 'block' }}>
                   <img src="/mdi_web.png" alt="Website" style={{ width: '24px', height: '24px' }} />
