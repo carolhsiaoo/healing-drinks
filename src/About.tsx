@@ -121,16 +121,16 @@ const About: React.FC = () => {
                 gap: '15px',
                 marginTop: '20px',
               }}>
-                <a href="#" style={{ display: 'block' }}>
+                <a href="https://www.carolhsiao.com/" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
                   <img src="/mdi_web.png" alt="Website" style={{ width: '24px', height: '24px' }} />
                 </a>
-                <a href="#" style={{ display: 'block' }}>
+                <a href="https://www.linkedin.com/in/carol-hsiao-5779a1158/" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
                   <img src="/mdi_linkedin.png" alt="LinkedIn" style={{ width: '24px', height: '24px' }} />
                 </a>
-                <a href="#" style={{ display: 'block' }}>
+                <a href="https://github.com/carolhsiaoo" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
                   <img src="/mdi_github.png" alt="GitHub" style={{ width: '24px', height: '24px' }} />
                 </a>
-                <a href="#" style={{ display: 'block' }}>
+                <a href="https://x.com/CarolXiaoo" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
                   <img src="/prime_twitter.png" alt="Twitter" style={{ width: '24px', height: '24px' }} />
                 </a>
               </div>
