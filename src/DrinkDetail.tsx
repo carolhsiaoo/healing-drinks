@@ -420,7 +420,7 @@ export default function DrinkDetail() {
         zIndex: 2
       }}>
         {/* Repeating horizontal text */}
-        {[...Array(5)].map((_, index) => (
+        {[...Array(8)].map((_, index) => (
           <h1 key={index} style={{
             fontSize: '96px',
             fontWeight: 'bold',
