@@ -79,6 +79,7 @@ const Header: React.FC<HeaderProps> = ({ showMusicIcon = false }) => {
             color: showMusicIcon ? '#1a1a1a' : 'black',
             textDecoration: 'none',
             cursor: 'pointer',
+            fontWeight: 600,
           }}
         >
           About
