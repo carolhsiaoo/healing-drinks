@@ -26,6 +26,11 @@ const Header: React.FC<HeaderProps> = ({ showMusicIcon = false }) => {
     window.playClickSound?.();
     navigate('/about');
   };
+
+  const handleLogoClick = () => {
+    window.playClickSound?.();
+    navigate('/');
+  };
   return (
     <div style={{
       position: 'absolute',
@@ -38,11 +43,15 @@ const Header: React.FC<HeaderProps> = ({ showMusicIcon = false }) => {
       padding: '30px 50px',
       zIndex: showMusicIcon ? 100 : 20,
     }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.7rem', 
-      }}>
+      <div 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.7rem',
+          cursor: 'pointer',
+        }}
+        onClick={handleLogoClick}
+      >
         <img 
           src="/Logo.svg" 
           alt="Healing Drinks Logo" 
