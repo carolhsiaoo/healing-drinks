@@ -316,7 +316,7 @@ export default function App() {
   const drinkBannerTexts = [
     'Move to Feel Better',
     'Emotional Support',
-    'Learn to Heal',
+    'Simple Comforts',
     'Scientific Healing',
     'Motivation Boost'
   ];
