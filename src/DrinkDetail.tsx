@@ -7,6 +7,7 @@ import { useControls } from 'leva';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
 import Header from './components/Header';
+import styles from './DrinkDetail.module.css';
 
 interface DrinkModelProps {
   modelPath: string;
@@ -128,6 +129,25 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
   const isFirstLoad = useRef(true);
   const baseMousePosition = useRef({ x: 0, y: 0 });
   
+  // Check for mobile/tablet for scale adjustment
+  const [scale, setScale] = useState(0.12);
+  
+  useEffect(() => {
+    const updateScale = () => {
+      if (window.innerWidth <= 480) {
+        setScale(0.08); // Smaller on mobile
+      } else if (window.innerWidth <= 768) {
+        setScale(0.1); // Medium on tablet
+      } else {
+        setScale(0.12); // Default on desktop
+      }
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+  
   // Base tilt constant
   const baseTiltX = 0.5;
   
@@ -244,7 +264,7 @@ function DrinkModel({ modelPath, tiltStrength, tiltSmoothness, enableTilt }: Dri
   });
 
   return (
-    <group ref={group} scale={0.2} position={[0, 0, 0]}>
+    <group ref={group} scale={scale} position={[0, 0, 0]}>
       {/* Center the model in the canvas */}
       <group position={[0, -1, 0]}>
         <primitive object={scene} />
@@ -272,11 +292,38 @@ export default function DrinkDetail() {
   
   const drinkId = parseInt(id || '0', 10);
   
+  // Check if mobile/tablet
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth <= 480);
+      setIsTablet(window.innerWidth > 480 && window.innerWidth <= 768);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+  
+  // Adjust camera settings based on device
+  const getDefaultCameraSettings = () => {
+    if (isMobile) {
+      return { positionZ: 4.5, fov: 60 };
+    } else if (isTablet) {
+      return { positionZ: 3.5, fov: 55 };
+    }
+    return { positionZ: 3, fov: 50 };
+  };
+  
+  const defaultSettings = getDefaultCameraSettings();
+  
   const cameraControls = useControls('Detail Camera', {
     positionX: { value: 0, min: -10, max: 10, step: 0.1 },
     positionY: { value: 0, min: -5, max: 10, step: 0.1 },
-    positionZ: { value: 3, min: -10, max: 10, step: 0.1 },
-    fov: { value: 50, min: 20, max: 120, step: 1 },
+    positionZ: { value: defaultSettings.positionZ, min: -10, max: 10, step: 0.1 },
+    fov: { value: defaultSettings.fov, min: 20, max: 120, step: 1 },
   });
   
   const tiltControls = useControls('Detail Tilt Effect', {
@@ -378,7 +425,7 @@ export default function DrinkDetail() {
 
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div className={styles.container}>
       <VantaFog 
         baseColor={currentColors.baseColor}
         highlightColor={currentColors.highlightColor}
@@ -390,46 +437,24 @@ export default function DrinkDetail() {
       <Header showMusicIcon={true} />
 
       {/* Scientific Healing subtitle */}
-      <div style={{
-        position: 'absolute',
-        top: '120px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        textAlign: 'center',
-        zIndex: 100
-      }}>
-        <h3 style={{ 
-          fontSize: '24px', 
-          color: drinkTitleColors[drinkId], 
-          fontWeight: 'bold',
-          margin: 0
-        }}>{drinkCategories[drinkId]}</h3>
+      <div className={styles.subtitle}>
+        <h3 
+          className={styles.subtitleText}
+          style={{ color: drinkTitleColors[drinkId] }}
+        >
+          {drinkCategories[drinkId]}
+        </h3>
       </div>
 
       {/* Drink Title Pattern - Behind everything */}
-      <div style={{
-        position: 'absolute',
-        top: '45%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '200%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        zIndex: 2
-      }}>
+      <div className={styles.titlePattern}>
         {/* Repeating horizontal text */}
         {[...Array(8)].map((_, index) => (
-          <h1 key={index} style={{
-            fontSize: '96px',
-            fontWeight: 'bold',
-            color: drinkTitleColors[drinkId],
-            margin: '0 20px',
-            textTransform: 'capitalize',
-            whiteSpace: 'nowrap',
-            opacity: 0.3
-          }}>
+          <h1 
+            key={index} 
+            className={styles.titleRepeat}
+            style={{ color: drinkTitleColors[drinkId] }}
+          >
             {drinkNames[drinkId]}
           </h1>
         ))}
@@ -437,35 +462,16 @@ export default function DrinkDetail() {
 
 
       {/* Description Text */}
-      <div style={{
-        position: 'absolute',
-        bottom: '250px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        maxWidth: '700px',
-        textAlign: 'left',
-        zIndex: 100
-      }}>
-        <p style={{
-          fontSize: '20px',
-          lineHeight: '1.6',
-          fontWeight: 600,
-          color: drinkTitleColors[drinkId]
-        }}
-        dangerouslySetInnerHTML={{ __html: drinkDescriptions[drinkId] }}
+      <div className={styles.description}>
+        <p 
+          className={styles.descriptionText}
+          style={{ color: drinkTitleColors[drinkId] }}
+          dangerouslySetInnerHTML={{ __html: drinkDescriptions[drinkId] }}
         />
       </div>
       
       <Canvas
-        style={{ 
-          width: '500px', 
-          height: '500px', 
-          position: 'absolute',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 20
-        }}
+        className={styles.canvas}
         camera={{ 
           position: [cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ], 
           fov: cameraControls.fov 
@@ -498,15 +504,7 @@ export default function DrinkDetail() {
       </Canvas>
       
       {/* Carousel Dots */}
-      <div style={{
-        position: 'absolute',
-        bottom: '200px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        gap: '8px',
-        zIndex: 100
-      }}>
+      <div className={styles.carouselDots}>
         {drinks.map((_, index) => (
           <button
             key={index}
@@ -514,15 +512,9 @@ export default function DrinkDetail() {
               window.playClickSound?.();
               navigate(`/drink/${index}`);
             }}
+            className={styles.dot}
             style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              border: 'none',
               backgroundColor: index === drinkId ? drinkTitleColors[drinkId] : '#ffffff',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              padding: 0
             }}
             aria-label={`Go to ${drinkNames[index]}`}
           />
@@ -530,34 +522,14 @@ export default function DrinkDetail() {
       </div>
 
       {/* Navigation Buttons */}
-      <div style={{
-        position: 'absolute',
-        bottom: '100px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        gap: '20px',
-        alignItems: 'center',
-        zIndex: 100
-      }}>
+      <div className={styles.navigation}>
         {/* Previous Drink */}
         <button
           onClick={() => {
             window.playClickSound?.();
             navigate(`/drink/${(drinkId - 1 + drinkNames.length) % drinkNames.length}`);
           }}
-          style={{
-            padding: '12px 25px',
-            backgroundColor: 'white',
-            color: 'black',
-            border: 'none',
-            borderRadius: '30px',
-            fontSize: '18px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-          }}
+          className={styles.navButton}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#f0f0f0';
             e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
@@ -578,18 +550,7 @@ export default function DrinkDetail() {
             window.playClickSound?.();
             navigate('/');
           }}
-          style={{
-            padding: '12px 40px',
-            backgroundColor: 'white',
-            color: 'black',
-            border: 'none',
-            borderRadius: '30px',
-            fontSize: '18px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-          }}
+          className={styles.backButton}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#f0f0f0';
             e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
@@ -610,18 +571,7 @@ export default function DrinkDetail() {
             window.playClickSound?.();
             navigate(`/drink/${(drinkId + 1) % drinkNames.length}`);
           }}
-          style={{
-            padding: '12px 25px',
-            backgroundColor: 'white',
-            color: 'black',
-            border: 'none',
-            borderRadius: '30px',
-            fontSize: '18px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-          }}
+          className={styles.navButton}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#f0f0f0';
             e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
@@ -638,48 +588,19 @@ export default function DrinkDetail() {
       </div>
       
       {/* Scrolling Banner */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        opacity: 0.55,
-        width: '100%',
-        height: '60px',
-        backgroundColor: drinkTitleColors[drinkId],
-        display: 'flex',
-        alignItems: 'center',
-        overflow: 'hidden',
-        zIndex: 100
-      }}>
-        <div style={{
-          display: 'flex',
-          animation: 'scroll 20s linear infinite',
-          whiteSpace: 'nowrap',
-          color: 'white',
-          fontSize: '18px',
-          fontWeight: '500'
-        }}>
+      <div 
+        className={styles.banner}
+        style={{ backgroundColor: drinkTitleColors[drinkId] }}
+      >
+        <div className={styles.bannerContent}>
           {Array(10).fill(null).map((_, i) => (
-            <span key={i} style={{ 
-              marginRight: '60px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '40px'
-            }}>
+            <span key={i} className={styles.bannerItem}>
               <span>{drinkBannerTexts[drinkId]}</span>
               <span>✦</span>
             </span>
           ))}
         </div>
       </div>
-      <style>
-        {`
-          @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-        `}
-      </style>
     </div>
   );
 }

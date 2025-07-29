@@ -1,0 +1,201 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 20;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  color: rgba(61, 61, 61, 1);
+  margin: 0;
+}
+
+.scrollingDrinkName {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+  transform: translateY(-50%);
+}
+
+.scrollingText {
+  display: flex;
+  white-space: nowrap;
+  animation: scroll 50s linear infinite;
+  font-size: 140px;
+  font-weight: bold;
+  color: rgba(61, 61, 61, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 10px;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.canvas {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.navigationContainer {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 20;
+}
+
+.bannerText {
+  font-size: 20px;
+  color: rgba(61, 61, 61, 1);
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.navButton, .chooseButton {
+  padding: 15px 25px;
+  font-size: 18px;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chooseButton {
+  padding: 15px 40px;
+}
+
+/* Tablet styles */
+@media (max-width: 768px) {
+  .hero {
+    top: 12%;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .scrollingText {
+    font-size: 100px;
+    letter-spacing: 8px;
+  }
+  
+  .bannerText {
+    font-size: 18px;
+    margin-bottom: 25px;
+  }
+  
+  .navButton, .chooseButton {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  
+  .chooseButton {
+    padding: 12px 35px;
+  }
+  
+  .buttonGroup {
+    gap: 15px;
+  }
+  
+  .navigationContainer {
+    bottom: 12%;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 480px) {
+  .hero {
+    top: 10%;
+    width: 90%;
+  }
+  
+  .title {
+    font-size: 24px;
+  }
+  
+  .scrollingDrinkName {
+    height: 100px;
+  }
+  
+  .scrollingText {
+    font-size: 70px;
+    letter-spacing: 5px;
+  }
+  
+  .bannerText {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .navButton, .chooseButton {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  
+  .chooseButton {
+    padding: 10px 28px;
+  }
+  
+  .buttonGroup {
+    gap: 10px;
+  }
+  
+  .navigationContainer {
+    bottom: 10%;
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+  .title {
+    font-size: 20px;
+  }
+  
+  .scrollingText {
+    font-size: 50px;
+  }
+  
+  .bannerText {
+    font-size: 14px;
+  }
+  
+  .navButton, .chooseButton {
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+  
+  .chooseButton {
+    padding: 8px 24px;
+  }
+}

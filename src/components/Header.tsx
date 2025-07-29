@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { audioService } from '../services/audioService';
+import styles from './Header.module.css';
 
 interface HeaderProps {
   showMusicIcon?: boolean;
@@ -32,83 +33,46 @@ const Header: React.FC<HeaderProps> = ({ showMusicIcon = false }) => {
     navigate('/');
   };
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '30px 50px',
-      zIndex: showMusicIcon ? 100 : 20,
-    }}>
+    <div 
+      className={styles.header}
+      style={{ zIndex: showMusicIcon ? 100 : 20 }}
+    >
       <div 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.7rem',
-          cursor: 'pointer',
-        }}
+        className={styles.logoContainer}
         onClick={handleLogoClick}
       >
         <img 
           src="/Logo.svg" 
           alt="Healing Drinks Logo" 
-          style={{ 
-            width: '2rem', // 32px
-            height: '2rem' // 32px
-          }} 
+          className={styles.logo}
         />
-        <span style={{
-          fontSize: '1.5rem', // 24px
-          fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-          fontWeight: 'bold',
-          color: showMusicIcon ? '#1a1a1a' : 'black',
-        }}>
+        <span 
+          className={styles.brandName}
+          style={{ color: showMusicIcon ? '#1a1a1a' : 'black' }}
+        >
           Healing Drinks
         </span>
       </div>
       
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+      <div className={styles.navContainer}>
         <a 
           href="/about"
           onClick={handleAboutClick}
-          style={{
-            fontSize: '18px',
-            color: showMusicIcon ? '#1a1a1a' : 'black',
-            textDecoration: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
+          className={styles.aboutLink}
+          style={{ color: showMusicIcon ? '#1a1a1a' : 'black' }}
         >
           About
         </a>
         <button
           onClick={handleMusicToggle}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '5px',
-            transition: 'opacity 0.3s ease',
-            opacity: isMuted ? 0.5 : 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: 'none',
-            outline: 'none',
-          }}
+          className={styles.musicButton}
+          style={{ opacity: isMuted ? 0.5 : 1 }}
           title={isMuted ? 'Unmute' : 'Mute'}
         >
           <img 
             src={isMuted ? '/music_off.svg' : '/music_note.svg'} 
             alt={isMuted ? 'Music Off' : 'Music On'}
-            style={{
-              width: '24px',
-              height: '24px',
-              filter: 'brightness(0) saturate(100%)',
-            }}
+            className={styles.musicIcon}
           />
         </button>
       </div>

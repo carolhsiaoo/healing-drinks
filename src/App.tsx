@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
 import Header from './components/Header';
+import styles from './App.module.css';
 
 interface DrinkProps {
   modelPath: string;
@@ -27,6 +28,25 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
   const previousFocusedIndex = useRef(focusedIndex);
   const [tiltEnabled, setTiltEnabled] = useState(true);
   const baseMousePosition = useRef({ x: 0, y: 0 });
+  
+  // Check for mobile/tablet for scale adjustment
+  const [scale, setScale] = useState(0.05);
+  
+  useEffect(() => {
+    const updateScale = () => {
+      if (window.innerWidth <= 480) {
+        setScale(0.04); // Smaller on mobile
+      } else if (window.innerWidth <= 768) {
+        setScale(0.045); // Medium on tablet
+      } else {
+        setScale(0.05); // Default on desktop
+      }
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
   
   // Reset tilt when focus changes with delay
   useEffect(() => {
@@ -154,7 +174,8 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
     group.current.position.y = 0.2 + Math.sin(t * 2 + index) * 0.05;
     
     // 縮放效果
-    const targetScale = isFocused ? 0.25 : 0.1;
+    const baseScale = scale;
+    const targetScale = isFocused ? baseScale * 5 : baseScale * 2; // Focused is 5x, unfocused is 2x base scale
     group.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
   });
 
@@ -163,7 +184,7 @@ function Drink({ modelPath, position, index, focusedIndex, onClick, tiltStrength
       ref={group}
       position={position}
       onClick={() => onClick(index)}
-      scale={0.05}
+      scale={scale}
     >
       {/* Offset the model down so rotation happens around the base */}
       <group position={[0, -0.3, 0]}>
@@ -267,6 +288,22 @@ function Scene({ cameraControls, tiltControls, focusedIndex, onFocusChange }: Sc
 export default function App() {
   const [focusedDrinkIndex, setFocusedDrinkIndex] = useState(0);
   const navigate = useNavigate();
+  
+  // Check if mobile/tablet
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth <= 480);
+      setIsTablet(window.innerWidth > 480 && window.innerWidth <= 768);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+  
   const drinkNames = [
     'Smoothie',
     'Latte', 
@@ -284,13 +321,25 @@ export default function App() {
     'Motivation Boost'
   ];
   
+  // Adjust camera settings based on device
+  const getDefaultCameraSettings = () => {
+    if (isMobile) {
+      return { positionY: 2.5, orbitMultiplier: 4.0, fov: 50 };
+    } else if (isTablet) {
+      return { positionY: 2.3, orbitMultiplier: 3.5, fov: 45 };
+    }
+    return { positionY: 2.2, orbitMultiplier: 3.0, fov: 40 };
+  };
+  
+  const defaultSettings = getDefaultCameraSettings();
+  
   const cameraControls = useControls('Main Camera', {
     positionX: { value: 0, min: -10, max: 10, step: 0.1 },
-    positionY: { value: 2.2, min: 0, max: 10, step: 0.1 },
+    positionY: { value: defaultSettings.positionY, min: 0, max: 10, step: 0.1 },
     positionZ: { value: 0, min: -10, max: 10, step: 0.1 },
-    orbitMultiplier: { value: 3.0, min: 0.5, max: 3, step: 0.1 },
+    orbitMultiplier: { value: defaultSettings.orbitMultiplier, min: 0.5, max: 5, step: 0.1 },
     lookAtY: { value: 0.3, min: -2, max: 5, step: 0.1 },
-    fov: { value: 40, min: 10, max: 120, step: 1 },
+    fov: { value: defaultSettings.fov, min: 10, max: 120, step: 1 },
   });
   
   const tiltControls = useControls('Main Tilt Effect', {
@@ -312,7 +361,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div className={styles.container}>
       <VantaFog 
         baseColor="#fffbfa"
         highlightColor="#f2e8e6"
@@ -325,56 +374,25 @@ export default function App() {
       <Header />
 
       {/* Main Title */}
-      <div style={{
-        position: 'absolute',
-        top: '15%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        textAlign: 'center',
-        zIndex: 20,
-      }}>
-        <h1 style={{
-          fontSize: '36px',
-          fontWeight: 'bold',
-          color: 'rgba(61, 61, 61, 1)',
-          margin: 0,
-        }}>
-          Chose your healing drink
+      <div className={styles.hero}>
+        <h1 className={styles.title}>
+          Choose your healing drink
         </h1>
       </div>
 
       {/* Scrolling Drink Name Behind 3D Models */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '0',
-        width: '100%',
-        height: '140px',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        zIndex: 5,
-        transform: 'translateY(-50%)',
-      }}>
+      <div className={styles.scrollingDrinkName}>
         <div 
           key={focusedDrinkIndex}
-          style={{
-            display: 'flex',
-            whiteSpace: 'nowrap',
-            animation: 'scroll 50s linear infinite',
-            fontSize: '140px',
-            fontWeight: 'bold',
-            color: 'rgba(61, 61, 61, 0.5)',
-            textTransform: 'uppercase',
-            letterSpacing: '10px',
-          }}
+          className={styles.scrollingText}
         >
           {Array(20).fill(drinkNames[focusedDrinkIndex]).join(' • ')}
         </div>
       </div>
 
       <Canvas
-        style={{ width: '100vw', height: '100vh', zIndex: 10, position: 'relative' }}
+        className={styles.canvas}
+        style={{ zIndex: 10 }}
         camera={{ 
           position: [cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ], 
           fov: cameraControls.fov 
@@ -388,45 +406,18 @@ export default function App() {
 
 
       {/* Navigation and Choose Buttons */}
-      <div style={{
-        position: 'absolute',
-        bottom: '15%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        textAlign: 'center',
-        zIndex: 20,
-      }}>
+      <div className={styles.navigationContainer}>
         {/* Banner Text */}
-        <p style={{
-          fontSize: '20px',
-          color: 'rgba(61, 61, 61, 1)',
-          fontWeight: 'bold',
-          marginBottom: '30px',
-        }}>
+        <p className={styles.bannerText}>
           {drinkBannerTexts[focusedDrinkIndex]}
         </p>
         
         {/* Button Group */}
-        <div style={{
-          display: 'flex',
-          gap: '20px',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        <div className={styles.buttonGroup}>
           {/* Left Arrow */}
           <button
             onClick={handlePrevDrink}
-            style={{
-              padding: '15px 25px',
-              fontSize: '18px',
-              backgroundColor: 'white',
-              color: 'black',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-            }}
+            className={styles.navButton}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f0f0f0';
               e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
@@ -447,17 +438,7 @@ export default function App() {
               window.playClickSound?.();
               navigate(`/drink/${focusedDrinkIndex}`);
             }}
-            style={{
-              padding: '15px 40px',
-              fontSize: '18px',
-              backgroundColor: 'white',
-              color: 'black',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-            }}
+            className={styles.chooseButton}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f0f0f0';
               e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
@@ -475,17 +456,7 @@ export default function App() {
           {/* Right Arrow */}
           <button
             onClick={handleNextDrink}
-            style={{
-              padding: '15px 25px',
-              fontSize: '18px',
-              backgroundColor: 'white',
-              color: 'black',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-            }}
+            className={styles.navButton}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f0f0f0';
               e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';

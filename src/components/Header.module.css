@@ -1,0 +1,109 @@
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 50px;
+  z-index: 20;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+}
+
+.logo {
+  width: 2rem;
+  height: 2rem;
+}
+
+.brandName {
+  font-size: 1.5rem;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-weight: bold;
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.aboutLink {
+  font-size: 18px;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.musicButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  outline: none;
+}
+
+.musicIcon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) saturate(100%);
+}
+
+/* Tablet styles */
+@media (max-width: 768px) {
+  .header {
+    padding: 20px 30px;
+  }
+  
+  .brandName {
+    font-size: 1.25rem;
+  }
+  
+  .aboutLink {
+    font-size: 16px;
+  }
+  
+  .navContainer {
+    gap: 15px;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 480px) {
+  .header {
+    padding: 15px 20px;
+  }
+  
+  .logo {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .brandName {
+    font-size: 1rem;
+  }
+  
+  .aboutLink {
+    font-size: 14px;
+  }
+  
+  .musicIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .navContainer {
+    gap: 10px;
+  }
+}

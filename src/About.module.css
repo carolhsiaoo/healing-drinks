@@ -1,0 +1,221 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 90%;
+  max-width: 800px;
+  z-index: 20;
+}
+
+.section {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3d3d3d;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sectionText {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #3d3d3d;
+  margin: 0;
+}
+
+.contributorContent {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.contributorInfo {
+  flex: 1;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.socialIcon {
+  display: block;
+}
+
+.socialIcon img {
+  width: 24px;
+  height: 24px;
+}
+
+.backButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.backButton {
+  padding: 15px 50px;
+  font-size: 18px;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
+/* Tablet styles */
+@media (max-width: 768px) {
+  .content {
+    gap: 20px;
+    width: 85%;
+  }
+  
+  .section {
+    padding: 30px;
+    border-radius: 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .sectionText {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  
+  .contributorContent {
+    gap: 15px;
+  }
+  
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .socialLinks {
+    margin-top: 15px;
+  }
+  
+  .socialIcon img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .backButton {
+    padding: 12px 40px;
+    font-size: 16px;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 480px) {
+  .content {
+    gap: 15px;
+    width: 90%;
+    top: 55%;
+  }
+  
+  .section {
+    padding: 20px;
+    border-radius: 15px;
+  }
+  
+  .sectionTitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .sectionText {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  .contributorContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .avatar {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto;
+  }
+  
+  .contributorInfo {
+    width: 100%;
+  }
+  
+  .socialLinks {
+    justify-content: center;
+    margin-top: 15px;
+    gap: 20px;
+  }
+  
+  .socialIcon img {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .backButton {
+    padding: 10px 30px;
+    font-size: 14px;
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 360px) {
+  .content {
+    top: 52%;
+  }
+  
+  .section {
+    padding: 15px;
+  }
+  
+  .sectionTitle {
+    font-size: 16px;
+  }
+  
+  .sectionText {
+    font-size: 13px;
+  }
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+}
