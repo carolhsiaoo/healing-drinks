@@ -158,7 +158,11 @@
 /* Tablet styles */
 @media (max-width: 768px) {
   .subtitle {
-    top: 100px;
+    position: absolute;
+    top: calc(38% - 200px - 24px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
   
   .subtitleText {
@@ -219,8 +223,8 @@
 @media (max-width: 480px) {
   .subtitle {
     position: fixed;
-    top: auto;
-    bottom: 480px;
+    top: calc(50% - 150px - 24px);
+    bottom: auto;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -307,7 +311,12 @@
 /* Very small mobile */
 @media (max-width: 360px) {
   .subtitle {
-    bottom: 430px;
+    position: fixed;
+    top: calc(43% - 130px - 24px);
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
   
   .subtitleText {

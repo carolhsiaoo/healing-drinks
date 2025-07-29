@@ -98,7 +98,10 @@
 /* Tablet styles */
 @media (max-width: 768px) {
   .hero {
-    top: 12%;
+    position: absolute;
+    top: calc(50% - 200px - 24px); /* Center - half 3D scene height - gap */
+    left: 50%;
+    transform: translateX(-50%);
   }
   
   .title {
@@ -129,14 +132,19 @@
   }
   
   .navigationContainer {
-    bottom: 12%;
+    position: absolute;
+    top: calc(50% + 200px + 24px); /* Center + half 3D scene height + gap */
+    bottom: auto;
   }
 }
 
 /* Mobile styles */
 @media (max-width: 480px) {
   .hero {
-    top: 10%;
+    position: absolute;
+    top: calc(45% - 150px - 24px); /* Center - half 3D scene height - gap */
+    left: 50%;
+    transform: translateX(-50%);
     width: 90%;
   }
   
@@ -146,6 +154,7 @@
   
   .scrollingDrinkName {
     height: 100px;
+    top: 45%;
   }
   
   .scrollingText {
@@ -172,14 +181,24 @@
   }
   
   .navigationContainer {
-    bottom: 10%;
+    position: absolute;
+    top: calc(45% + 150px + 40px); /* Center + half 3D scene height + gap */
+    bottom: auto;
   }
 }
 
 /* Very small mobile */
 @media (max-width: 360px) {
+  .hero {
+    top: calc(43% - 130px - 24px); /* Center - half 3D scene height - gap */
+  }
+  
   .title {
     font-size: 20px;
+  }
+  
+  .scrollingDrinkName {
+    top: 43%;
   }
   
   .scrollingText {
@@ -188,6 +207,7 @@
   
   .bannerText {
     font-size: 14px;
+    margin-bottom: 15px;
   }
   
   .navButton, .chooseButton {
@@ -197,5 +217,9 @@
   
   .chooseButton {
     padding: 8px 24px;
+  }
+  
+  .navigationContainer {
+    top: calc(43% + 130px + 24px); /* Center + half 3D scene height + gap */
   }
 }

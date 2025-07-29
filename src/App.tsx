@@ -324,7 +324,7 @@ export default function App() {
   // Adjust camera settings based on device
   const getDefaultCameraSettings = () => {
     if (isMobile) {
-      return { positionY: 2.5, orbitMultiplier: 4.0, fov: 50 };
+      return { positionY: 2.8, orbitMultiplier: 4.5, fov: 55 };
     } else if (isTablet) {
       return { positionY: 2.3, orbitMultiplier: 3.5, fov: 45 };
     }
