@@ -17,11 +17,12 @@
   max-height: 90vh;
   margin: 5vh auto;
   padding: 20px;
-  padding-bottom: 100px; /* Space for fixed back button */
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   z-index: 20;
   position: relative;
+  scroll-behavior: smooth;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -40,6 +41,14 @@
 
 .content::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure smooth scrolling and proper momentum on iOS */
+@supports (-webkit-touch-callout: none) {
+  .content {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: scroll;
+  }
 }
 
 .section {
@@ -101,13 +110,9 @@
 }
 
 .backButtonContainer {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 30;
   display: flex;
   justify-content: center;
+  margin-top: 10px;
 }
 
 .backButton {
@@ -175,19 +180,18 @@
   .container {
     align-items: flex-start;
     padding-top: 70px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
   
   .content {
     gap: 15px;
     width: 90%;
-    max-height: none;
-    height: auto;
+    max-height: calc(100vh - 80px);
     margin: 10px auto;
     padding: 15px;
-    padding-bottom: 80px; /* Space for fixed back button */
-    overflow-y: visible;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent iOS bounce-back */
+    overscroll-behavior: contain;
   }
   
   .section {
@@ -234,15 +238,9 @@
     height: 22px;
   }
   
-  .backButtonContainer {
-    bottom: 15px;
-  }
-  
   .backButton {
     padding: 10px 30px;
     font-size: 14px;
-    background-color: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
   }
 }
 
@@ -251,7 +249,6 @@
   .content {
     padding: 10px;
     width: 95%;
-    padding-bottom: 70px; /* Smaller space for button on very small screens */
   }
   
   .section {

@@ -76,26 +76,26 @@ const About: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Back Button - Outside content for fixed positioning */}
-      <div className={styles.backButtonContainer}>
-        <button
-          onClick={handleBackClick}
-          className={styles.backButton}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#f0f0f0';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'white';
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          Back
-        </button>
+        {/* Back Button */}
+        <div className={styles.backButtonContainer}>
+          <button
+            onClick={handleBackClick}
+            className={styles.backButton}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f0f0f0';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );
