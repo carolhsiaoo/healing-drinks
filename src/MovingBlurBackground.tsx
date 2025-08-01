@@ -88,7 +88,7 @@ export function MovingBlurBackground({
     uSpeed: number;
     uWaveFreq: number;
     uMixStrength: number;
-  }>();
+  }>(null);
   const { size } = useThree();
 
   useFrame(({ clock }) => {
@@ -112,7 +112,18 @@ export function MovingBlurBackground({
   return (
     <mesh scale={[size.width, size.height, 1]} position={[0, 0, -10]}>
       <planeGeometry args={[1, 1]} />
-      <blurGradientMaterial ref={mat} />
+      <blurGradientMaterial
+        uTime={0}
+        uRes={[size.width, size.height]}
+        uColor1={color1 ? new THREE.Color(color1) : new THREE.Color(1.0, 0.9, 0.85)}
+        uColor2={color2 ? new THREE.Color(color2) : new THREE.Color(0.9, 0.95, 1.0)}
+        uColor3={color3 ? new THREE.Color(color3) : new THREE.Color(1.0, 1.0, 0.8)}
+        uSpeed={speed}
+        uWaveFreq={waveFreq}
+        uMixStrength={mixStrength}
+        // @ts-ignore
+        ref={mat}
+      />
     </mesh>
   );
 }
