@@ -2,7 +2,8 @@
   width: 100vw;
   height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,40 +15,35 @@
   gap: 30px;
   width: 90%;
   max-width: 800px;
-  max-height: 90vh;
-  margin: 5vh auto;
+  margin: 20px auto;
   padding: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  z-index: 20;
+  padding-bottom: 40px;
+  z-index: 10;
   position: relative;
-  scroll-behavior: smooth;
 }
 
 /* Hide scrollbar but keep functionality */
-.content::-webkit-scrollbar {
+.container::-webkit-scrollbar {
   width: 8px;
 }
 
-.content::-webkit-scrollbar-track {
+.container::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.content::-webkit-scrollbar-thumb {
+.container::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
 }
 
-.content::-webkit-scrollbar-thumb:hover {
+.container::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
 
 /* Ensure smooth scrolling and proper momentum on iOS */
 @supports (-webkit-touch-callout: none) {
-  .content {
+  .container {
     -webkit-overflow-scrolling: touch;
-    overflow-y: scroll;
   }
 }
 
@@ -180,18 +176,16 @@
   .container {
     align-items: flex-start;
     padding-top: 70px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .content {
     gap: 15px;
     width: 90%;
-    max-height: calc(100vh - 80px);
     margin: 10px auto;
     padding: 15px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    /* Prevent iOS bounce-back */
-    overscroll-behavior: contain;
+    padding-bottom: 30px;
   }
   
   .section {
