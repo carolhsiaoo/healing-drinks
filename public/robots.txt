@@ -1,0 +1,8 @@
+# Robots.txt for Healing Drinks
+# Allow all web crawlers to access all content
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.healingdrinks.carolhsiao.com/sitemap.xml
