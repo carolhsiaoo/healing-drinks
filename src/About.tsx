@@ -7,6 +7,44 @@ import styles from './About.module.css';
 const About: React.FC = () => {
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    // Fix for iOS Safari scrolling issues in embedded browsers
+    const container = document.querySelector(`.${styles.container}`) as HTMLElement;
+    if (container) {
+      // Force repaint to fix Safari scrolling
+      container.style.transform = 'translateZ(0)';
+      
+      // Ensure touch events work properly
+      let touchStartY = 0;
+      
+      const handleTouchStart = (e: TouchEvent) => {
+        touchStartY = e.touches[0].clientY;
+      };
+      
+      const handleTouchMove = (e: TouchEvent) => {
+        const touchY = e.touches[0].clientY;
+        const scrollTop = container.scrollTop;
+        const scrollHeight = container.scrollHeight;
+        const height = container.clientHeight;
+        
+        const isScrollingUp = touchY > touchStartY && scrollTop === 0;
+        const isScrollingDown = touchY < touchStartY && scrollTop + height >= scrollHeight;
+        
+        if (isScrollingUp || isScrollingDown) {
+          e.preventDefault();
+        }
+      };
+      
+      container.addEventListener('touchstart', handleTouchStart, { passive: true });
+      container.addEventListener('touchmove', handleTouchMove, { passive: false });
+      
+      return () => {
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchmove', handleTouchMove);
+      };
+    }
+  }, []);
+
   const handleBackClick = () => {
     window.playClickSound?.();
     navigate('/');
