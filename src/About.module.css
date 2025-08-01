@@ -2,19 +2,42 @@
   width: 100vw;
   height: 100vh;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   gap: 30px;
   width: 90%;
   max-width: 800px;
+  max-height: 90vh;
+  margin: 5vh auto;
+  padding: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   z-index: 20;
+}
+
+/* Hide scrollbar but keep functionality */
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .section {
@@ -143,10 +166,17 @@
 
 /* Mobile styles */
 @media (max-width: 480px) {
+  .container {
+    align-items: flex-start;
+    padding-top: 70px;
+  }
+  
   .content {
     gap: 15px;
     width: 90%;
-    top: 55%;
+    max-height: calc(100vh - 80px);
+    margin: 10px auto;
+    padding: 15px;
   }
   
   .section {
@@ -202,7 +232,8 @@
 /* Very small mobile */
 @media (max-width: 360px) {
   .content {
-    top: 52%;
+    padding: 10px;
+    width: 95%;
   }
   
   .section {
