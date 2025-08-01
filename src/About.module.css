@@ -10,7 +10,30 @@
   justify-content: center;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
-  background-color: #fffbfa; /* Match VantaFog base color */
+  background-color: transparent; /* Allow VantaFog to show through */
+  z-index: 1; /* Above VantaFog */
+}
+
+.scrollWrapper {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  position: relative;
+}
+
+.scrollWrapper::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent 0%, #fffbfa 100%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .content {
@@ -54,7 +77,9 @@
 }
 
 .section {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 30px;
   padding: 40px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -194,8 +219,15 @@
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* Ensure background extends to cover scrollable area */
-    background-color: #fffbfa;
+    /* Transparent to show VantaFog */
+    background-color: transparent;
+    z-index: 1;
+  }
+  
+  .scrollWrapper {
+    height: auto;
+    display: block;
+    background: transparent; /* Transparent to show fog */
   }
   
   .content {
@@ -203,8 +235,8 @@
     width: 90%;
     margin: 10px auto;
     padding: 15px;
-    padding-bottom: 100px; /* Extra padding for scroll */
-    min-height: calc(100vh - 80px); /* Ensure minimum height */
+    padding-bottom: 30px; /* Reduced padding */
+    /* Removed min-height to prevent extra space */
     /* Prevent elastic scrolling on content */
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;

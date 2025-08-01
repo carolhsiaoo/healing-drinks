@@ -62,8 +62,9 @@ const About: React.FC = () => {
       
       <div className={styles.container}>
         <Header />
-
-      <div className={styles.content}>
+        
+        <div className={styles.scrollWrapper}>
+          <div className={styles.content}>
         {/* Inspiration Section */}
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>
@@ -136,6 +137,7 @@ const About: React.FC = () => {
           </button>
         </div>
       </div>
+        </div>
       </div>
     </>
   );
