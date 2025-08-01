@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { useControls } from 'leva';
 
 declare global {
   interface Window {
@@ -12,17 +11,17 @@ export default function VantaClouds() {
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffect = useRef<any>(null);
 
-  const controls = useControls('Vanta Clouds', {
-    skyColor: { value: '#c5e0f8', label: 'Sky Color' },
-    cloudColor: { value: '#c6ddf2', label: 'Cloud Color' },
-    cloudShadowColor: { value: '#8eafcb', label: 'Cloud Shadow' },
-    sunColor: { value: '#e5aa82', label: 'Sun Color' },
-    sunGlareColor: { value: '#e5b493', label: 'Sun Glare' },
-    sunlightColor: { value: '#ffffff', label: 'Sunlight' },
-    speed: { value: 0.60, min: 0, max: 2, step: 0.1, label: 'Speed' },
-    mouseControls: { value: true, label: 'Mouse Controls' },
-    touchControls: { value: true, label: 'Touch Controls' }
-  });
+  const controls = {
+    skyColor: '#c5e0f8',
+    cloudColor: '#c6ddf2',
+    cloudShadowColor: '#8eafcb',
+    sunColor: '#e5aa82',
+    sunGlareColor: '#e5b493',
+    sunlightColor: '#ffffff',
+    speed: 0.60,
+    mouseControls: true,
+    touchControls: true
+  };
 
   useEffect(() => {
     // Dynamically import Vanta Clouds effect

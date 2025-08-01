@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react';
 import VANTA from 'vanta/dist/vanta.fog.min';
 import * as THREE from 'three';
-import { useControls } from 'leva';
 
 interface VantaFogProps {
   baseColor?: string;
@@ -22,32 +21,21 @@ const VantaFog = ({
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffect = useRef<ReturnType<typeof VANTA> | null>(null);
 
-  const [controls, set] = useControls('Vanta Fog', () => ({
-    baseColor: { value: baseColor },
-    highlightColor: { value: highlightColor },
-    midtoneColor: { value: midtoneColor },
-    lowlightColor: { value: lowlightColor },
-    blurFactor: { value: 0.8, min: 0, max: 1, step: 0.1 },
-    speed: { value: 1, min: 0, max: 5, step: 0.1 },
-    zoom: { value: 1, min: 0.1, max: 3, step: 0.1 },
-    scale: { value: 2, min: 1, max: 10, step: 0.5 },
-    scaleMobile: { value: 4, min: 1, max: 10, step: 0.5 },
+  const controls = {
+    baseColor: baseColor,
+    highlightColor: highlightColor,
+    midtoneColor: midtoneColor,
+    lowlightColor: lowlightColor,
+    blurFactor: 0.8,
+    speed: 1,
+    zoom: 1,
+    scale: 2,
+    scaleMobile: 4,
     mouseControls: true,
     touchControls: true,
     gyroControls: false,
-  }), { collapsed: !enableControls });
+  };
 
-  // Update Leva controls when props change
-  useEffect(() => {
-    console.log('VantaFog - Props changed, updating Leva controls');
-    // Update Leva controls to reflect new prop values
-    set({
-      baseColor: baseColor,
-      highlightColor: highlightColor,
-      midtoneColor: midtoneColor,
-      lowlightColor: lowlightColor
-    });
-  }, [baseColor, highlightColor, midtoneColor, lowlightColor, set]);
 
   // Initialize and update Vanta effect
   useEffect(() => {

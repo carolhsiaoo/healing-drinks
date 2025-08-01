@@ -3,7 +3,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PresentationControls, useGLTF, PerspectiveCamera, Environment, Html, useProgress } from '@react-three/drei';
 import { Suspense, useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import { useControls } from 'leva';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial';
 import Header from './components/Header';
@@ -319,23 +318,23 @@ export default function DrinkDetail() {
   
   const defaultSettings = getDefaultCameraSettings();
   
-  const cameraControls = useControls('Detail Camera', {
-    positionX: { value: 0, min: -10, max: 10, step: 0.1 },
-    positionY: { value: 0, min: -5, max: 10, step: 0.1 },
-    positionZ: { value: defaultSettings.positionZ, min: -10, max: 10, step: 0.1 },
-    fov: { value: defaultSettings.fov, min: 20, max: 120, step: 1 },
-  });
+  const cameraControls = {
+    positionX: 0,
+    positionY: 0,
+    positionZ: defaultSettings.positionZ,
+    fov: defaultSettings.fov,
+  };
   
-  const tiltControls = useControls('Detail Tilt Effect', {
-    tiltStrength: { value: 0.3, min: 0, max: 1, step: 0.05 },
-    tiltSmoothness: { value: 0.1, min: 0.01, max: 0.3, step: 0.01 },
-    enableTilt: { value: true },
-  });
+  const tiltControls = {
+    tiltStrength: 0.3,
+    tiltSmoothness: 0.1,
+    enableTilt: true,
+  };
   
-  const presentationControls = useControls('Presentation Controls', {
-    autoResetDelay: { value: 3000, min: 1000, max: 10000, step: 500 },
-    enableAutoReset: { value: true },
-  });
+  const presentationControls = {
+    autoResetDelay: 3000,
+    enableAutoReset: true,
+  };
   const drinks = [
     '/drink4.glb',
     '/drink2.glb',

@@ -2,7 +2,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, PerspectiveCamera, Environment } from '@react-three/drei';
 import { Suspense, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
-import { useControls } from 'leva';
 import { useNavigate } from 'react-router-dom';
 import VantaFog from './VantaFog';
 import { ChocolateShaderMaterial } from './Shader/ChocolateShaderMaterial.ts';
@@ -333,20 +332,20 @@ export default function App() {
   
   const defaultSettings = getDefaultCameraSettings();
   
-  const cameraControls = useControls('Main Camera', {
-    positionX: { value: 0, min: -10, max: 10, step: 0.1 },
-    positionY: { value: defaultSettings.positionY, min: 0, max: 10, step: 0.1 },
-    positionZ: { value: 0, min: -10, max: 10, step: 0.1 },
-    orbitMultiplier: { value: defaultSettings.orbitMultiplier, min: 0.5, max: 5, step: 0.1 },
-    lookAtY: { value: 0.3, min: -2, max: 5, step: 0.1 },
-    fov: { value: defaultSettings.fov, min: 10, max: 120, step: 1 },
-  });
+  const cameraControls = {
+    positionX: 0,
+    positionY: defaultSettings.positionY,
+    positionZ: 0,
+    orbitMultiplier: defaultSettings.orbitMultiplier,
+    lookAtY: 0.3,
+    fov: defaultSettings.fov,
+  };
   
-  const tiltControls = useControls('Main Tilt Effect', {
-    tiltStrength: { value: 1, min: 0, max: 1, step: 0.05 },
-    tiltSmoothness: { value: 0.1, min: 0.01, max: 0.3, step: 0.01 },
-    enableTilt: { value: true },
-  });
+  const tiltControls = {
+    tiltStrength: 1,
+    tiltSmoothness: 0.1,
+    enableTilt: true,
+  };
 
   const handlePrevDrink = () => {
     const newIndex = (focusedDrinkIndex - 1 + drinkNames.length) % drinkNames.length;
