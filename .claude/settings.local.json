@@ -4,7 +4,14 @@
       "Bash(npm run lint)",
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(dir:*)",
+      "Bash(powershell:*)",
+      "Bash(python:*)",
+      "Bash(git checkout:*)",
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
