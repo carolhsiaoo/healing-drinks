@@ -14,8 +14,7 @@ const VantaFog = ({
   baseColor = '#fffbfa',
   highlightColor = '#f2e8e6',
   midtoneColor = '#a1c7ef',
-  lowlightColor = '#e3f4fc',
-  enableControls = true
+  lowlightColor = '#e3f4fc'
 }: VantaFogProps) => {
   console.log('VantaFog - Received props:', { baseColor, highlightColor, midtoneColor, lowlightColor });
   const vantaRef = useRef<HTMLDivElement>(null);
