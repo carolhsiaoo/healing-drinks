@@ -51,7 +51,7 @@ const About: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <>
       <VantaFog 
         baseColor="#fffbfa"
         highlightColor="#f2e8e6"
@@ -60,7 +60,8 @@ const About: React.FC = () => {
         enableControls={false}
       />
       
-      <Header />
+      <div className={styles.container}>
+        <Header />
 
       <div className={styles.content}>
         {/* Inspiration Section */}
@@ -135,7 +136,8 @@ const About: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

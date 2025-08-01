@@ -10,6 +10,7 @@
   justify-content: center;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
+  background-color: #fffbfa; /* Match VantaFog base color */
 }
 
 .content {
@@ -193,6 +194,8 @@
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    /* Ensure background extends to cover scrollable area */
+    background-color: #fffbfa;
   }
   
   .content {
